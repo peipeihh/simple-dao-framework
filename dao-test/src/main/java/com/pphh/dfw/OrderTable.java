@@ -16,10 +16,10 @@ public class OrderTable extends AbstractTable {
 
     public static final OrderTable ORDER = new OrderTable();
 
-    public final ITableField ID = new TableField("id");
-    public final ITableField NAME = new TableField("name");
-    public final ITableField CITY_ID = new TableField("city_id");
-    public final ITableField COUNTRY_ID = new TableField("country_id");
+    public final TableField ID = new TableField("id");
+    public final TableField NAME = new TableField("name");
+    public final TableField CITY_ID = new TableField("city_id");
+    public final TableField COUNTRY_ID = new TableField("country_id");
 
     public OrderTable() {
         super("order");

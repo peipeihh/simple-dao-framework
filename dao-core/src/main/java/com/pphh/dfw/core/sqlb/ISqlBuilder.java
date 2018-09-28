@@ -3,6 +3,7 @@ package com.pphh.dfw.core.sqlb;
 import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.table.AbstractTableField;
+import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
 
@@ -24,7 +25,7 @@ public interface ISqlBuilder {
 
     ISqlBuilder from(ITable... tables);
 
-    ISqlBuilder where(Object... conditions);
+    ISqlBuilder where(Expression... conditions);
 
     ISqlBuilder insertInto(ITable table);
 
@@ -34,7 +35,7 @@ public interface ISqlBuilder {
 
     ISqlBuilder update(ITable table);
 
-    ISqlBuilder set(Object... sets);
+    ISqlBuilder set(Expression... sets);
 
     ISqlBuilder deleteFrom(ITable table);
 

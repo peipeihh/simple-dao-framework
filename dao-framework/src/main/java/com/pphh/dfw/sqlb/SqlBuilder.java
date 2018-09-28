@@ -7,6 +7,7 @@ import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
+import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
 
@@ -44,7 +45,6 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public ISqlBuilder select(ITableField... fields) {
-        this.sqlSegements.clear();
         if (fields.length == 0) {
             selectAll();
         } else {
@@ -55,21 +55,18 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public ISqlBuilder selectAll() {
-        this.sqlSegements.clear();
         this.append(SELECT, STAR);
         return this;
     }
 
     @Override
     public ISqlBuilder selectDistinct(ITableField... fields) {
-        this.sqlSegements.clear();
         this.append(SELECT, DISTINCT, comma(fields));
         return this;
     }
 
     @Override
     public ISqlBuilder selectCount() {
-        this.sqlSegements.clear();
         this.append(SELECT, COUNTALL);
         return this;
     }
@@ -81,8 +78,8 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public ISqlBuilder where(Object... conditions) {
-        this.append(WHERE);
+    public ISqlBuilder where(Expression... conditions) {
+        this.append(WHERE, comma(conditions));
         return this;
     }
 
@@ -94,7 +91,7 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public ISqlBuilder insertInto(ITable table, ITableField... fields) {
-        this.append(INSERT, INTO, LBRACKET, comma(fields), RBRACKET);
+        this.append(INSERT, INTO, table, LBRACKET, comma(fields), RBRACKET);
         return this;
     }
 
@@ -102,9 +99,10 @@ public class SqlBuilder implements ISqlBuilder {
     public ISqlBuilder values(Object... values) {
         List<ISqlSegement> segements = new LinkedList<>();
         for (Object value : values) {
-            segements.add(new SqlSegement(values.toString()));
+            String formattedValue = String.format("'%s'", value);
+            segements.add(new SqlSegement(formattedValue));
         }
-        this.append(LBRACKET, comma(segements.toArray(new ISqlSegement[0])), RBRACKET);
+        this.append(VALUES, LBRACKET, comma(segements.toArray(new ISqlSegement[0])), RBRACKET);
         return this;
     }
 
@@ -115,12 +113,14 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public ISqlBuilder set(Object... sets) {
+    public ISqlBuilder set(Expression... sets) {
+        this.append(SET, comma(sets));
         return this;
     }
 
     @Override
     public ISqlBuilder deleteFrom(ITable table) {
+        this.append(DELETE, FROM, table);
         return this;
     }
 
