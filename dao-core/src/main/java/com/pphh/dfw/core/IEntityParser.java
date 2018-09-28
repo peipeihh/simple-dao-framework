@@ -1,6 +1,6 @@
 package com.pphh.dfw.core;
 
-import com.pphh.dfw.core.table.ITableDefinition;
+import com.pphh.dfw.core.table.ITable;
 
 /**
  * Please add description here.
@@ -10,6 +10,6 @@ import com.pphh.dfw.core.table.ITableDefinition;
  */
 public interface IEntityParser {
 
-    ITableDefinition parse();
+    ITable parse();
 
 }

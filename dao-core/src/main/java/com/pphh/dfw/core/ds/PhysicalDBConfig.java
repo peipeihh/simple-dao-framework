@@ -19,7 +19,7 @@ public class PhysicalDBConfig {
     private String userName;
     private String userPwd;
     private String dbName;
-    private String shardValue;
+    private String inShard;
     private String connectionUrl;
     private String connectionProperties;
     private Properties poolProperties = new Properties();
@@ -102,12 +102,12 @@ public class PhysicalDBConfig {
         this.connectionProperties = connectionProperties;
     }
 
-    public String getShardValue() {
-        return shardValue;
+    public String getInShard() {
+        return inShard;
     }
 
-    public void setShardValue(String shardValue) {
-        this.shardValue = shardValue;
+    public void setInShard(String inShard) {
+        this.inShard = inShard;
     }
 
     public Properties getPoolProperties() {

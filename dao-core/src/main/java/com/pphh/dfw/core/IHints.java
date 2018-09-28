@@ -14,4 +14,12 @@ public interface IHints {
 
     IHints setIdBack();
 
+    IHints inDbShard();
+
+    IHints inTableShard();
+
+    IHints dbShardValue();
+
+    IHints tableShardValue();
+
 }

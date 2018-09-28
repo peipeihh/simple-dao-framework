@@ -1,4 +1,8 @@
-package com.pphh.dfw.core;
+package com.pphh.dfw.core.dao;
+
+import com.pphh.dfw.core.IEntity;
+import com.pphh.dfw.core.IHints;
+import com.pphh.dfw.core.sqlb.ISqlBuilder;
 
 import java.util.List;
 import java.util.function.Function;

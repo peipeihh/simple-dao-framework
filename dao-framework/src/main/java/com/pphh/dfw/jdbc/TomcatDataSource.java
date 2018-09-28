@@ -1,33 +1,42 @@
-package com.pphh.dfw;
+package com.pphh.dfw.jdbc;
 
+
+import com.pphh.dfw.GlobalDataSourceConfig;
+import com.pphh.dfw.core.jdbc.IDataSource;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.junit.Test;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Please add description here.
  *
  * @author huangyinhuang
- * @date 9/21/2018
+ * @date 9/26/2018
  */
-public class ConfigLoaderTest {
+public class TomcatDataSource implements IDataSource {
 
-    @Test
-    public void testConfigLoader() throws Exception {
+    private DataSource dataSource;
+
+    public TomcatDataSource() throws Exception {
         GlobalDataSourceConfig instance = GlobalDataSourceConfig.getInstance().load();
 
         PhysicalDBConfig physicalDBConfig = instance.getPhysicalDBConfigMap("db0");
-
         PoolProperties p = new PoolProperties();
         p.setUrl(physicalDBConfig.getConnectionUrl());
         p.setUsername(physicalDBConfig.getUserName());
         p.setPassword(physicalDBConfig.getUserPwd());
         p.setConnectionProperties(physicalDBConfig.getConnectionProperties());
 
-        DataSource dataSource = new DataSource(p);
-        TestConnection.testConnection(dataSource);
+        this.dataSource = new org.apache.tomcat.jdbc.pool.DataSource(p);
     }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
 
 }

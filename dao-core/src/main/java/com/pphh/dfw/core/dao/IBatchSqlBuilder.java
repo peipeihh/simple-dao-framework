@@ -1,4 +1,6 @@
-package com.pphh.dfw.core;
+package com.pphh.dfw.core.dao;
+
+import com.pphh.dfw.core.sqlb.ISqlBuilder;
 
 /**
  * Please add description here.

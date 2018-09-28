@@ -109,7 +109,7 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
         dbConfig.setUserName(propertyList.getProperty(prefix + ".userName"));
         dbConfig.setUserPwd(propertyList.getProperty(prefix + ".userPwd"));
         dbConfig.setDbName(propertyList.getProperty(prefix + ".dbName"));
-        dbConfig.setShardValue(propertyList.getProperty(prefix + ".shardValue"));
+        dbConfig.setInShard(propertyList.getProperty(prefix + ".inShard"));
         return dbConfig;
     }
 

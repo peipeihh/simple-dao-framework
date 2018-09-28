@@ -1,6 +1,9 @@
 package com.pphh.dfw;
 
 import com.pphh.dfw.core.*;
+import com.pphh.dfw.core.dao.IBatchSqlBuilder;
+import com.pphh.dfw.core.dao.IDao;
+import com.pphh.dfw.core.sqlb.ISqlBuilder;
 
 import java.util.List;
 import java.util.function.Function;

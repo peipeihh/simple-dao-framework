@@ -16,6 +16,7 @@
         <sqljdbc-version>6.2.2.jre7</sqljdbc-version>
         <mysql-connector-version>5.1.38</mysql-connector-version>
         <oracle-jdbc-thin-version>11.2.0.3</oracle-jdbc-thin-version>
+        <javax-persistence-version>1.0.2</javax-persistence-version>
     </properties>
 
 
@@ -24,6 +25,11 @@
             <groupId>com.pphh.demo</groupId>
             <artifactId>dao-core</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>${javax-persistence-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>

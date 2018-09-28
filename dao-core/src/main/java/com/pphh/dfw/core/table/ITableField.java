@@ -1,6 +1,6 @@
 package com.pphh.dfw.core.table;
 
-import java.util.List;
+import com.pphh.dfw.core.sqlb.ISqlSegement;
 
 /**
  * Please add description here.
@@ -8,8 +8,5 @@ import java.util.List;
  * @author huangyinhuang
  * @date 9/21/2018
  */
-public interface ITableDefinition {
-
-    List<IColumnDefinition> getColumns();
-
+public interface ITableField extends ISqlSegement {
 }
