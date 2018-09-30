@@ -83,6 +83,6 @@ public interface ISqlBuilder {
 
     String build();
 
-    String buildOn(IDao dao);
+    String buildOn(String logicDb);
 
 }

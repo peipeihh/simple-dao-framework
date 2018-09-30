@@ -18,7 +18,7 @@ public class SqlBuilderTest {
     @Test
     public void testSelect() {
         sqlBuilder = new SqlBuilder();
-        sqlBuilder.select(order.ID, order.NAME).from(order);
+        sqlBuilder.select(order.id, order.name).from(order);
         Assert.assertEquals("SELECT `id` , `name` FROM `order`", sqlBuilder.build());
 
         sqlBuilder = new SqlBuilder();
@@ -33,33 +33,33 @@ public class SqlBuilderTest {
     @Test
     public void testInsert(){
         sqlBuilder = new SqlBuilder();
-        sqlBuilder.insertInto(order, order.ID, order.NAME).values("1", "apple");
+        sqlBuilder.insertInto(order, order.id, order.name).values("1", "apple");
         Assert.assertEquals("INSERT INTO `order` ( `id` , `name` ) VALUES ( '1' , 'apple' )", sqlBuilder.build());
     }
 
     @Test
     public void testUpdate(){
         sqlBuilder = new SqlBuilder();
-        sqlBuilder.update(order).set(order.ID.equal(2), order.NAME.equal("banana"));
+        sqlBuilder.update(order).set(order.id.equal(2), order.name.equal("banana"));
         Assert.assertEquals("UPDATE `order` SET `id` = '2' , `name` = 'banana'", sqlBuilder.build());
 
         sqlBuilder = new SqlBuilder();
-        sqlBuilder.update(order).set(order.ID.equal(2), order.NAME.equal("banana")).where(order.ID.equal(1));
+        sqlBuilder.update(order).set(order.id.equal(2), order.name.equal("banana")).where(order.id.equal(1));
         Assert.assertEquals("UPDATE `order` SET `id` = '2' , `name` = 'banana' WHERE `id` = '1'", sqlBuilder.build());
 
         sqlBuilder = new SqlBuilder();
-        sqlBuilder.update(order).set(order.ID.equal(2), order.NAME.equal("banana")).where(order.ID.equal(1), order.NAME.equal("apple"));
+        sqlBuilder.update(order).set(order.id.equal(2), order.name.equal("banana")).where(order.id.equal(1), order.name.equal("apple"));
         Assert.assertEquals("UPDATE `order` SET `id` = '2' , `name` = 'banana' WHERE `id` = '1' , `name` = 'apple'", sqlBuilder.build());
     }
 
     @Test
     public void testDelete(){
         sqlBuilder = new SqlBuilder();
-        sqlBuilder.deleteFrom(order).where(order.ID.equal(1));
+        sqlBuilder.deleteFrom(order).where(order.id.equal(1));
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1'", sqlBuilder.build());
 
         sqlBuilder = new SqlBuilder();
-        sqlBuilder.deleteFrom(order).where(order.ID.equal(1), order.NAME.equal("apple"));
+        sqlBuilder.deleteFrom(order).where(order.id.equal(1), order.name.equal("apple"));
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' , `name` = 'apple'", sqlBuilder.build());
     }
 

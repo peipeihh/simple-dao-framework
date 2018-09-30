@@ -15,29 +15,33 @@ import java.util.function.Function;
  */
 public interface IDao {
 
-    IEntity queryByPk(IEntity entity);
+    <T extends IEntity> T queryByPk(T entity);
 
-    List<IEntity> queryBySample(IEntity entity);
+    <T extends IEntity> List<T> queryBySample(T entity);
 
-    List<IEntity> queryAll(Long max);
+    <T extends IEntity> List<T> queryAll(Long limit);
 
-    int insert(IEntity entity);
+    <T extends IEntity> long countBySample(T entity);
 
-    int[] insert(List<IEntity> entities);
+    <T extends IEntity> int insert(T entity);
 
-    int delete(IEntity entity);
+    <T extends IEntity> int[] insert(List<T> entities);
 
-    int[] delete(List<IEntity> entities);
+    <T extends IEntity> int delete(T entity);
 
-    int update(IEntity entity);
+    <T extends IEntity> int deleteBySample(T entity);
 
-    int[] update(List<IEntity> entities);
+    <T extends IEntity> int[] delete(List<T> entities);
+
+    <T extends IEntity> int update(T entity);
+
+    <T extends IEntity> int[] update(List<T> entities);
+
+    <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder);
+
+    <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder);
 
     int execute(Function function);
-
-    IEntity queryForObject(ISqlBuilder sqlBuilder);
-
-    List<IEntity> queryForList(ISqlBuilder sqlBuilder);
 
     int run(ISqlBuilder sqlBuilder);
 

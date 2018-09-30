@@ -1,5 +1,7 @@
 package com.pphh.dfw;
 
+import com.pphh.dfw.core.IEntity;
+
 import javax.persistence.*;
 
 /**
@@ -9,7 +11,7 @@ import javax.persistence.*;
  * @date 9/27/2018
  */
 @Table(name = "order")
-public class OrderEntity {
+public class OrderEntity implements IEntity {
 
     @Id
     @Column(name = "PeopleID")

@@ -255,7 +255,7 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public String buildOn(IDao dao) {
+    public String buildOn(String logicDb) {
         return null;
     }
 }

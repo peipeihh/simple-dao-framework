@@ -4,6 +4,7 @@ import com.pphh.dfw.core.*;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
+import com.pphh.dfw.sqlb.SqlBuilder;
 
 import java.util.List;
 import java.util.function.Function;
@@ -16,65 +17,84 @@ import java.util.function.Function;
  */
 public class Dao implements IDao {
 
+    private String logicDbName;
+    private SqlBuilder sqlBuilder;
+
+    public Dao(String logicDbName) {
+        this.logicDbName = logicDbName;
+    }
 
     @Override
-    public IEntity queryByPk(IEntity entity) {
+    public <T extends IEntity> T queryByPk(T entity) {
+        // 获取entity definition + 主键Id + 主键
+        sqlBuilder.select().from().where().into(entity.getClass());
+        String sql = sqlBuilder.buildOn(logicDbName);
         return null;
     }
 
     @Override
-    public List<IEntity> queryBySample(IEntity entity) {
+    public <T extends IEntity> List<T> queryBySample(T entity) {
         return null;
     }
 
     @Override
-    public List<IEntity> queryAll(Long max) {
+    public <T extends IEntity> List<T> queryAll(Long limit) {
         return null;
     }
 
     @Override
-    public int insert(IEntity entity) {
+    public <T extends IEntity> long countBySample(T entity) {
         return 0;
     }
 
     @Override
-    public int[] insert(List<IEntity> entities) {
-        return new int[0];
-    }
-
-    @Override
-    public int delete(IEntity entity) {
+    public <T extends IEntity> int insert(T entity) {
         return 0;
     }
 
     @Override
-    public int[] delete(List<IEntity> entities) {
+    public <T extends IEntity> int[] insert(List<T> entities) {
         return new int[0];
     }
 
     @Override
-    public int update(IEntity entity) {
+    public <T extends IEntity> int delete(T entity) {
         return 0;
     }
 
     @Override
-    public int[] update(List<IEntity> entities) {
+    public <T extends IEntity> int deleteBySample(T entity) {
+        return 0;
+    }
+
+    @Override
+    public <T extends IEntity> int[] delete(List<T> entities) {
         return new int[0];
+    }
+
+    @Override
+    public <T extends IEntity> int update(T entity) {
+        return 0;
+    }
+
+    @Override
+    public <T extends IEntity> int[] update(List<T> entities) {
+        return new int[0];
+    }
+
+    @Override
+    public <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder) {
+        return null;
+    }
+
+    @Override
+    public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder) {
+        return null;
     }
 
     @Override
     public int execute(Function function) {
         return 0;
-    }
-
-    @Override
-    public IEntity queryForObject(ISqlBuilder sqlBuilder) {
-        return null;
-    }
-
-    @Override
-    public List<IEntity> queryForList(ISqlBuilder sqlBuilder) {
-        return null;
     }
 
     @Override
