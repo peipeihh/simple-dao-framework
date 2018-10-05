@@ -14,13 +14,24 @@ public class DaoTest {
 
     private SqlBuilder sqlBuilder;
     private OrderTable order = Tables.ORDER;
+    private Dao dao;
+
+    public DaoTest() throws Exception {
+        dao = DaoFactory.generate("tableShard");
+    }
 
     @Ignore
     @Test
     public void test() throws Exception {
-        Dao dao = DaoFactory.generate("tableShard");
         OrderEntity orderEntity = new OrderEntity();
         dao.insert(orderEntity);
+    }
+
+    @Test
+    public void testQuery() throws Exception {
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setId(1);
+        dao.queryByPk(orderEntity);
     }
 
 }

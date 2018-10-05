@@ -8,8 +8,8 @@ import com.pphh.dfw.core.table.ITable;
  * @author huangyinhuang
  * @date 9/21/2018
  */
-public interface IEntityParser {
+public interface IEntityParser<T extends ITable> {
 
-    ITable parse();
+    T parse(IEntity iEntity);
 
 }

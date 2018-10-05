@@ -1,8 +1,6 @@
 package com.pphh.dfw.table;
 
 
-import com.pphh.dfw.core.table.AbstractTableField;
-
 /**
  * Please add description here.
  *

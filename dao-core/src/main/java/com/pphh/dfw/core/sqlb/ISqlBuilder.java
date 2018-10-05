@@ -1,8 +1,6 @@
 package com.pphh.dfw.core.sqlb;
 
 import com.pphh.dfw.core.IHints;
-import com.pphh.dfw.core.dao.IDao;
-import com.pphh.dfw.core.table.AbstractTableField;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
@@ -13,6 +11,7 @@ import com.pphh.dfw.core.table.ITableField;
  * @author huangyinhuang
  * @date 9/21/2018
  */
+
 public interface ISqlBuilder {
 
     ISqlBuilder select(ITableField... fields);

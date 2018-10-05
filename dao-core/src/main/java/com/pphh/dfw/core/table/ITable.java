@@ -14,4 +14,6 @@ public interface ITable extends ISqlSegement {
 
     List<ITableField> getFields();
 
+    ITableField getPrimaryField();
+
 }

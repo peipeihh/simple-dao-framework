@@ -1,7 +1,8 @@
 package com.pphh.dfw;
 
 /**
- * Please add description here.
+ * a full collection of table definition
+ * please import this files before building sql with SqlBuilder
  *
  * @author huangyinhuang
  * @date 9/27/2018

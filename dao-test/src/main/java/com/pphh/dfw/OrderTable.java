@@ -1,13 +1,11 @@
 package com.pphh.dfw;
 
-import com.pphh.dfw.core.table.ITableField;
-import com.pphh.dfw.core.table.AbstractTable;
+import com.pphh.dfw.table.AbstractTable;
 import com.pphh.dfw.table.TableField;
 
-import java.util.List;
 
 /**
- * Please add description here.
+ * a table definition which is useful to build sql with SqlBuilder
  *
  * @author huangyinhuang
  * @date 9/27/2018
@@ -23,11 +21,11 @@ public class OrderTable extends AbstractTable {
 
     public OrderTable() {
         super("order");
-    }
-
-    @Override
-    public List<ITableField> getFields() {
-        return null;
+        this.insertFields(id);
+        this.insertFields(name);
+        this.insertFields(city_id);
+        this.insertFields(country_id);
+        this.setPrimaryField(id);
     }
 
 }

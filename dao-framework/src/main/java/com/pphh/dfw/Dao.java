@@ -4,7 +4,12 @@ import com.pphh.dfw.core.*;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
+import com.pphh.dfw.core.table.ITable;
+import com.pphh.dfw.core.table.ITableField;
+import com.pphh.dfw.table.AbstractTable;
+import com.pphh.dfw.table.AbstractTableField;
 import com.pphh.dfw.sqlb.SqlBuilder;
+import com.pphh.dfw.table.GenericTable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -19,16 +24,30 @@ public class Dao implements IDao {
 
     private String logicDbName;
     private SqlBuilder sqlBuilder;
+    private EntityParser entityParser;
 
     public Dao(String logicDbName) {
         this.logicDbName = logicDbName;
+        this.sqlBuilder = new SqlBuilder();
+        this.entityParser = new EntityParser();
     }
 
     @Override
     public <T extends IEntity> T queryByPk(T entity) {
-        // 获取entity definition + 主键Id + 主键
-        sqlBuilder.select().from().where().into(entity.getClass());
-        String sql = sqlBuilder.buildOn(logicDbName);
+        // parse entity, 获取entity definition
+        GenericTable table = this.entityParser.parse(entity);
+
+        if (table != null) {
+            // 主键Id + 主键
+            ITableField primaryKey = table.getPrimaryField();
+            String keyDefName = primaryKey.getFieldName();
+            Object value = table.getFieldValue(primaryKey);
+            sqlBuilder.select().from(table).where(primaryKey.equal(value)).into(entity.getClass());
+            //String sql = sqlBuilder.buildOn(logicDbName);
+            String sql = sqlBuilder.build();
+            System.out.println(sql);
+        }
+
         return null;
     }
 
