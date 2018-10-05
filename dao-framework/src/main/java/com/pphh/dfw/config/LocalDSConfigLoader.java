@@ -92,9 +92,19 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
         String[] dbEntries = propertyList.getProperty(prefix + ".dbEntries").split(",");
         dbConfig.setDbEntries(Stream.of(dbEntries).map(String::trim).collect(Collectors.toList()));
         dbConfig.setDefaultDriverContext(propertyList.getProperty(prefix + ".defaultDriverContext"));
+
         String shardStrategy = propertyList.getProperty(prefix + ".shardStrategy");
-        dbConfig.setShardStrategy((ShardStrategy) Class.forName(shardStrategy).newInstance());
+        if (shardStrategy != null){
+            ShardStrategy strategy = (ShardStrategy) Class.forName(shardStrategy).newInstance();
+            Properties settings = new Properties();
+            settings.setProperty("tableName", propertyList.getProperty(prefix + ".tableName"));
+            settings.setProperty("tableSeparator", propertyList.getProperty(prefix + ".tableSeparator"));
+            strategy.initialize(settings);
+            dbConfig.setShardStrategy(strategy);
+        }
+
         dbConfig.setDbShardColumn(propertyList.getProperty(prefix + ".dbShardColumn"));
+        dbConfig.setTableShardColumn(propertyList.getProperty(prefix + ".tableShardColumn"));
         dbConfig.setTableName(propertyList.getProperty(prefix + ".tableName"));
         dbConfig.setTableSeparator(propertyList.getProperty(prefix + ".tableSeparator"));
         return dbConfig;

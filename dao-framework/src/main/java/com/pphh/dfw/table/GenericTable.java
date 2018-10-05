@@ -22,12 +22,17 @@ public class GenericTable implements ITable {
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public List<ITableField> getFields() {
         return this.fields.entrySet().stream().map(Map.Entry<AbstractTableField, Object>::getKey).collect(Collectors.toList());
     }
 
     @Override
-    public ITableField getPrimaryField() {
+    public ITableField getPkField() {
         return primaryField;
     }
 
@@ -40,10 +45,10 @@ public class GenericTable implements ITable {
         return insertFields(field, value, Boolean.FALSE);
     }
 
-    public ITableField insertFields(String field, Object value, Boolean isPrimary) {
+    public ITableField insertFields(String field, Object value, Boolean isPrimaryKey) {
         TableField f = new TableField(field);
         fields.put(f, value);
-        if (isPrimary) {
+        if (isPrimaryKey) {
             this.primaryField = f;
         }
         return f;

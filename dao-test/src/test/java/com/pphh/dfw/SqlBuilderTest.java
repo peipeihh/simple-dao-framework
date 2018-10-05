@@ -31,14 +31,14 @@ public class SqlBuilderTest {
     }
 
     @Test
-    public void testInsert(){
+    public void testInsert() {
         sqlBuilder = new SqlBuilder();
         sqlBuilder.insertInto(order, order.id, order.name).values("1", "apple");
         Assert.assertEquals("INSERT INTO `order` ( `id` , `name` ) VALUES ( '1' , 'apple' )", sqlBuilder.build());
     }
 
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         sqlBuilder = new SqlBuilder();
         sqlBuilder.update(order).set(order.id.equal(2), order.name.equal("banana"));
         Assert.assertEquals("UPDATE `order` SET `id` = '2' , `name` = 'banana'", sqlBuilder.build());
@@ -53,7 +53,7 @@ public class SqlBuilderTest {
     }
 
     @Test
-    public void testDelete(){
+    public void testDelete() {
         sqlBuilder = new SqlBuilder();
         sqlBuilder.deleteFrom(order).where(order.id.equal(1));
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1'", sqlBuilder.build());
@@ -61,6 +61,24 @@ public class SqlBuilderTest {
         sqlBuilder = new SqlBuilder();
         sqlBuilder.deleteFrom(order).where(order.id.equal(1), order.name.equal("apple"));
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' , `name` = 'apple'", sqlBuilder.build());
+    }
+
+    @Test
+    public void testShard() {
+        sqlBuilder = new SqlBuilder();
+        sqlBuilder.deleteFrom(order).where(order.id.equal(1));
+
+        // noShard
+        Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1'", sqlBuilder.buildOn("noShard"));
+
+        // tableShard
+        Assert.assertEquals("DELETE FROM `order_1` WHERE `id` = '1'", sqlBuilder.buildOn("tableShard"));
+
+        // dbShard
+        Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' -- 1", sqlBuilder.buildOn("dbShard"));
+
+        // tableDbShard
+        Assert.assertEquals("DELETE FROM `order_1` WHERE `id` = '1' -- 1", sqlBuilder.buildOn("tableDbShard"));
     }
 
 

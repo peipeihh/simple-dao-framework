@@ -22,6 +22,10 @@ public abstract class AbstractTable implements ITable {
         this.name = name;
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
 
     @Override
     public List<ITableField> getFields() {
@@ -38,7 +42,7 @@ public abstract class AbstractTable implements ITable {
     }
 
     @Override
-    public ITableField getPrimaryField() {
+    public ITableField getPkField() {
         return primaryField;
     }
 
@@ -46,7 +50,7 @@ public abstract class AbstractTable implements ITable {
         fields.add(field);
     }
 
-    protected void setPrimaryField(AbstractTableField field) {
+    protected void setPkField(AbstractTableField field) {
         primaryField = field;
     }
 

@@ -25,7 +25,7 @@ public class OrderTable extends AbstractTable {
         this.insertFields(name);
         this.insertFields(city_id);
         this.insertFields(country_id);
-        this.setPrimaryField(id);
+        this.setPkField(id);
     }
 
 }

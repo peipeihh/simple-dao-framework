@@ -2,14 +2,19 @@ package com.pphh.dfw.sqlb;
 
 import static com.pphh.dfw.core.sqlb.SqlConstant.*;
 
+import com.pphh.dfw.GlobalDataSourceConfig;
 import com.pphh.dfw.Hints;
+import com.pphh.dfw.core.ShardStrategy;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.IHints;
+import com.pphh.dfw.core.ds.LogicDBConfig;
+import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
+import com.pphh.dfw.table.GenericTable;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -241,21 +246,78 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public String build() {
+        return build(this.sqlSegements);
+    }
+
+    @Override
+    public String buildOn(String logicDb) {
+
+        // 根据逻辑数据库定义，计算分库分表
+        String tableShard = null;
+        String dbShard = null;
+        GlobalDataSourceConfig instance = null;
+        try {
+            instance = GlobalDataSourceConfig.getInstance().load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (instance != null) {
+            LogicDBConfig logicDBConfig = instance.getLogicDBConfig(logicDb);
+
+            ShardStrategy strategy = logicDBConfig.getShardStrategy();
+            if (strategy != null) {
+
+                if (logicDBConfig.getDbShardColumn() != null && !logicDBConfig.getDbShardColumn().isEmpty()) {
+                    dbShard = strategy.calcDbShard("1");
+                }
+
+                if (logicDBConfig.getTableShardColumn() != null && !logicDBConfig.getTableShardColumn().isEmpty()) {
+                    tableShard = strategy.calcTableShard("1");
+                }
+
+            }
+        }
+
+
+        // 切换分库分表之后的sql拼接字段
+        List<ISqlSegement> shardSqlSegements = new LinkedList<>();
+
+        if (tableShard != null) {
+            for (ISqlSegement segement : sqlSegements) {
+                ISqlSegement seg = segement;
+                if (segement instanceof ITable) {
+                    seg = new GenericTable(tableShard);
+                }
+
+                shardSqlSegements.add(seg);
+            }
+        } else {
+            for (ISqlSegement segement : sqlSegements) {
+                shardSqlSegements.add(segement);
+            }
+        }
+
+
+        if (dbShard != null) {
+            shardSqlSegements.add(new Expression("-- " + dbShard));
+        }
+
+        return build(shardSqlSegements);
+    }
+
+
+    private String build(List<ISqlSegement> segements) {
         StringBuilder builder = new StringBuilder();
 
         int i = 1;
-        for (ISqlSegement segement : sqlSegements) {
+        for (ISqlSegement segement : segements) {
             builder.append(segement.buildSql());
-            if (i++ < sqlSegements.size()) {
+            if (i++ < segements.size()) {
                 builder.append(SPACE.buildSql());
             }
         }
 
         return builder.toString();
-    }
-
-    @Override
-    public String buildOn(String logicDb) {
-        return null;
     }
 }

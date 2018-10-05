@@ -12,8 +12,10 @@ import java.util.List;
  */
 public interface ITable extends ISqlSegement {
 
-    List<ITableField> getFields();
+    String getName();
 
-    ITableField getPrimaryField();
+    ITableField getPkField();
+
+    List<ITableField> getFields();
 
 }

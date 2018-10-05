@@ -4,10 +4,7 @@ import com.pphh.dfw.core.*;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
-import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
-import com.pphh.dfw.table.AbstractTable;
-import com.pphh.dfw.table.AbstractTableField;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import com.pphh.dfw.table.GenericTable;
 
@@ -39,12 +36,11 @@ public class Dao implements IDao {
 
         if (table != null) {
             // 主键Id + 主键
-            ITableField primaryKey = table.getPrimaryField();
+            ITableField primaryKey = table.getPkField();
             String keyDefName = primaryKey.getFieldName();
             Object value = table.getFieldValue(primaryKey);
             sqlBuilder.select().from(table).where(primaryKey.equal(value)).into(entity.getClass());
-            //String sql = sqlBuilder.buildOn(logicDbName);
-            String sql = sqlBuilder.build();
+            String sql = sqlBuilder.buildOn(logicDbName);
             System.out.println(sql);
         }
 
