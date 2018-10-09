@@ -12,8 +12,8 @@ public interface ShardStrategy {
 
     public void initialize(Properties settings);
 
-    public String calcDbShard(String value);
+    public String locateDbShard(String value, Boolean requireCalc);
 
-    public String calcTableShard(String value);
+    public String locateTableShard(String value, Boolean requireCalc);
 
 }

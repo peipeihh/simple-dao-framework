@@ -11,10 +11,7 @@ import org.junit.Test;
  * @author huangyinhuang
  * @date 9/30/2018
  */
-public class SqlBuilderOnDaoTest {
-
-    private SqlBuilder sqlBuilder;
-    private OrderTable order = Tables.ORDER;
+public class SqlBuilderOnDaoTest extends BaseTest {
 
     @Ignore
     @Test

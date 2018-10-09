@@ -1,6 +1,5 @@
 package com.pphh.dfw;
 
-import com.pphh.dfw.sqlb.SqlBuilder;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -10,10 +9,8 @@ import org.junit.Test;
  * @author huangyinhuang
  * @date 9/30/2018
  */
-public class DaoTest {
+public class DaoTest extends BaseTest {
 
-    private SqlBuilder sqlBuilder;
-    private OrderTable order = Tables.ORDER;
     private Dao dao;
 
     public DaoTest() throws Exception {
@@ -22,7 +19,7 @@ public class DaoTest {
 
     @Ignore
     @Test
-    public void test() throws Exception {
+    public void testInsert() throws Exception {
         OrderEntity orderEntity = new OrderEntity();
         dao.insert(orderEntity);
     }
@@ -33,5 +30,6 @@ public class DaoTest {
         orderEntity.setId(1);
         dao.queryByPk(orderEntity);
     }
+
 
 }

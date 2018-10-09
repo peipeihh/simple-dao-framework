@@ -5,6 +5,7 @@ import static com.pphh.dfw.core.sqlb.SqlConstant.*;
 import com.pphh.dfw.GlobalDataSourceConfig;
 import com.pphh.dfw.Hints;
 import com.pphh.dfw.core.ShardStrategy;
+import com.pphh.dfw.core.constant.HintEnum;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.ds.LogicDBConfig;
@@ -241,7 +242,7 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public IHints hints() {
-        return null;
+        return this.hints;
     }
 
     @Override
@@ -252,28 +253,41 @@ public class SqlBuilder implements ISqlBuilder {
     @Override
     public String buildOn(String logicDb) {
 
-        // 根据逻辑数据库定义，计算分库分表
+        // 加载逻辑数据库配置
         String tableShard = null;
         String dbShard = null;
-        GlobalDataSourceConfig instance = null;
+        GlobalDataSourceConfig dsConfig = null;
         try {
-            instance = GlobalDataSourceConfig.getInstance().load();
+            dsConfig = GlobalDataSourceConfig.getInstance().load();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if (instance != null) {
-            LogicDBConfig logicDBConfig = instance.getLogicDBConfig(logicDb);
+        // 根据逻辑数据库定义，计算分库分表
+        Object dbShardId = hints.getHintValue(HintEnum.DB_SHARD);
+        Object tableShardId = hints.getHintValue(HintEnum.TABLE_SHARD);
+        Object dbShardValue = hints.getHintValue(HintEnum.DB_SHARD_VALUE);
+        Object tableShardValue = hints.getHintValue(HintEnum.TABLE_SHARD_VALUE);
 
+        if (dsConfig != null) {
+            LogicDBConfig logicDBConfig = dsConfig.getLogicDBConfig(logicDb);
             ShardStrategy strategy = logicDBConfig.getShardStrategy();
             if (strategy != null) {
 
                 if (logicDBConfig.getDbShardColumn() != null && !logicDBConfig.getDbShardColumn().isEmpty()) {
-                    dbShard = strategy.calcDbShard("1");
+                    if (dbShardId != null) {
+                        dbShard = strategy.locateDbShard(dbShardId.toString(), Boolean.FALSE);
+                    } else {
+                        dbShard = strategy.locateDbShard(dbShardValue.toString(), Boolean.TRUE);
+                    }
                 }
 
                 if (logicDBConfig.getTableShardColumn() != null && !logicDBConfig.getTableShardColumn().isEmpty()) {
-                    tableShard = strategy.calcTableShard("1");
+                    if (tableShardId != null) {
+                        tableShard = strategy.locateTableShard(tableShardId.toString(), Boolean.FALSE);
+                    } else {
+                        tableShard = strategy.locateTableShard(tableShardValue.toString(), Boolean.TRUE);
+                    }
                 }
 
             }

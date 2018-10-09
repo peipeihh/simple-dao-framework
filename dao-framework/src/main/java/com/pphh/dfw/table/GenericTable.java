@@ -58,4 +58,16 @@ public class GenericTable implements ITable {
         return fields.get(field);
     }
 
+    public Object getFieldValue(String field) {
+        Object value = null;
+        for (Map.Entry<AbstractTableField, Object> entry : this.fields.entrySet()) {
+            AbstractTableField f = entry.getKey();
+            if (f.getFieldName().equals(field)) {
+                value = entry.getValue();
+                break;
+            }
+        }
+        return value;
+    }
+
 }

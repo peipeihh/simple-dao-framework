@@ -10,10 +10,7 @@ import org.junit.Test;
  * @author huangyinhuang
  * @date 9/27/2018
  */
-public class SqlBuilderTest {
-
-    private SqlBuilder sqlBuilder;
-    private OrderTable order = Tables.ORDER;
+public class SqlBuilderTest extends BaseTest {
 
     @Test
     public void testSelect() {
@@ -62,24 +59,5 @@ public class SqlBuilderTest {
         sqlBuilder.deleteFrom(order).where(order.id.equal(1), order.name.equal("apple"));
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' , `name` = 'apple'", sqlBuilder.build());
     }
-
-    @Test
-    public void testShard() {
-        sqlBuilder = new SqlBuilder();
-        sqlBuilder.deleteFrom(order).where(order.id.equal(1));
-
-        // noShard
-        Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1'", sqlBuilder.buildOn("noShard"));
-
-        // tableShard
-        Assert.assertEquals("DELETE FROM `order_1` WHERE `id` = '1'", sqlBuilder.buildOn("tableShard"));
-
-        // dbShard
-        Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' -- 1", sqlBuilder.buildOn("dbShard"));
-
-        // tableDbShard
-        Assert.assertEquals("DELETE FROM `order_1` WHERE `id` = '1' -- 1", sqlBuilder.buildOn("tableDbShard"));
-    }
-
 
 }

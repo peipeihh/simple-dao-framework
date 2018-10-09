@@ -1,4 +1,4 @@
-package com.pphh.dfw;
+package com.pphh.dfw.shard;
 
 import com.pphh.dfw.core.ShardStrategy;
 
@@ -12,6 +12,7 @@ import java.util.Properties;
  */
 public class ModShardStrategy implements ShardStrategy {
 
+    private Integer mode = 2;
     private String tableName;
     private String tableSeparator;
 
@@ -21,14 +22,21 @@ public class ModShardStrategy implements ShardStrategy {
         tableSeparator = settings.getProperty("tableSeparator");
     }
 
-    public String calcDbShard(String value) {
-        Long shard = Long.parseLong(value) % 2;
+    @Override
+    public String locateDbShard(String value, Boolean requireCalc) {
+        Long shard = Long.parseLong(value);
+        if (requireCalc) {
+            shard = shard % mode;
+        }
         return shard.toString();
     }
 
     @Override
-    public String calcTableShard(String value) {
-        Long shard = Long.parseLong(value) % 2;
+    public String locateTableShard(String value, Boolean requireCalc) {
+        Long shard = Long.parseLong(value);
+        if (requireCalc) {
+            shard = shard % mode;
+        }
         return String.format("%s%s%s", tableName, tableSeparator, shard.toString());
     }
 

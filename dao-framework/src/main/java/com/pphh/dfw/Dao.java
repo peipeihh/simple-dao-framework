@@ -3,6 +3,7 @@ package com.pphh.dfw;
 import com.pphh.dfw.core.*;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
+import com.pphh.dfw.core.ds.LogicDBConfig;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.sqlb.SqlBuilder;
@@ -20,12 +21,10 @@ import java.util.function.Function;
 public class Dao implements IDao {
 
     private String logicDbName;
-    private SqlBuilder sqlBuilder;
     private EntityParser entityParser;
 
     public Dao(String logicDbName) {
         this.logicDbName = logicDbName;
-        this.sqlBuilder = new SqlBuilder();
         this.entityParser = new EntityParser();
     }
 
@@ -39,7 +38,10 @@ public class Dao implements IDao {
             ITableField primaryKey = table.getPkField();
             String keyDefName = primaryKey.getFieldName();
             Object value = table.getFieldValue(primaryKey);
+
+            SqlBuilder sqlBuilder = new SqlBuilder();
             sqlBuilder.select().from(table).where(primaryKey.equal(value)).into(entity.getClass());
+            setShard(sqlBuilder, table);
             String sql = sqlBuilder.buildOn(logicDbName);
             System.out.println(sql);
         }
@@ -125,5 +127,38 @@ public class Dao implements IDao {
     @Override
     public IHints getHints() {
         return null;
+    }
+
+    private SqlBuilder setShard(SqlBuilder sqlBuilder, GenericTable table) {
+        // 加载逻辑数据库配置
+        GlobalDataSourceConfig dsConfig = null;
+        try {
+            dsConfig = GlobalDataSourceConfig.getInstance().load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 根据逻辑数据库定义，获取分库分表字段
+        if (dsConfig != null) {
+            LogicDBConfig logicDBConfig = dsConfig.getLogicDBConfig(logicDbName);
+            ShardStrategy strategy = logicDBConfig.getShardStrategy();
+            if (strategy != null) {
+
+                if (logicDBConfig.getDbShardColumn() != null && !logicDBConfig.getDbShardColumn().isEmpty()) {
+                    String dbShardColumn = logicDBConfig.getDbShardColumn();
+                    Object dbShard = table.getFieldValue(dbShardColumn);
+                    sqlBuilder.hints().dbShardValue(dbShard);
+                }
+
+                if (logicDBConfig.getTableShardColumn() != null && !logicDBConfig.getTableShardColumn().isEmpty()) {
+                    String tableShardColumn = logicDBConfig.getTableShardColumn();
+                    Object tableShard = table.getFieldValue(tableShardColumn);
+                    sqlBuilder.hints().tableShardValue(tableShard);
+                }
+
+            }
+        }
+
+        return sqlBuilder;
     }
 }

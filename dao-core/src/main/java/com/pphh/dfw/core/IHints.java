@@ -1,5 +1,7 @@
 package com.pphh.dfw.core;
 
+import com.pphh.dfw.core.constant.HintEnum;
+
 /**
  * Please add description here.
  *
@@ -14,12 +16,16 @@ public interface IHints {
 
     IHints setIdBack();
 
-    IHints inDbShard();
+    IHints inDbShard(Object value);
 
-    IHints inTableShard();
+    IHints inTableShard(Object value);
 
-    IHints dbShardValue();
+    IHints dbShardValue(Object value);
 
-    IHints tableShardValue();
+    IHints tableShardValue(Object value);
+
+    Object getHintValue(HintEnum hintEnum);
+
+    Boolean hasHint(HintEnum hintEnum);
 
 }
