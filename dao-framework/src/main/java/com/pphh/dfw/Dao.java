@@ -3,6 +3,7 @@ package com.pphh.dfw;
 import com.pphh.dfw.core.*;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
+import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.table.ITableField;
@@ -30,6 +31,8 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> T queryByPk(T entity) {
+        T result = null;
+
         // parse entity, 获取entity definition
         GenericTable table = this.entityParser.parse(entity);
 
@@ -39,11 +42,20 @@ public class Dao implements IDao {
             String keyDefName = primaryKey.getFieldName();
             Object value = table.getFieldValue(primaryKey);
 
-            SqlBuilder sqlBuilder = new SqlBuilder();
-            sqlBuilder.select().from(table).where(primaryKey.equal(value)).into(entity.getClass());
+            SqlBuilder sqlBuilder = new SqlBuilder(logicDbName);
+            sqlBuilder.select().from(table).where(primaryKey.equal(value));
             setShard(sqlBuilder, table);
             String sql = sqlBuilder.buildOn(logicDbName);
             System.out.println(sql);
+
+            try {
+                List<T> results = sqlBuilder.fetchInto(entity.getClass());
+                if (results.size() > 0) {
+                    result = results.get(0);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return null;
@@ -131,7 +143,7 @@ public class Dao implements IDao {
 
     private SqlBuilder setShard(SqlBuilder sqlBuilder, GenericTable table) {
         // 加载逻辑数据库配置
-        GlobalDataSourceConfig dsConfig = null;
+        IDataSourceConfig dsConfig = null;
         try {
             dsConfig = GlobalDataSourceConfig.getInstance().load();
         } catch (Exception e) {

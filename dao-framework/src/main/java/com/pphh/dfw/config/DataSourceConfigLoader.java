@@ -1,6 +1,7 @@
 package com.pphh.dfw.config;
 
 import com.pphh.dfw.core.ds.LogicDBConfig;
+import com.pphh.dfw.core.ds.PhysicalDBConfig;
 
 import java.util.Map;
 
@@ -12,6 +13,8 @@ import java.util.Map;
  */
 public interface DataSourceConfigLoader {
 
-    public Map<String, LogicDBConfig> load() throws Exception;
+    public Map<String, LogicDBConfig> loadLogic() throws Exception;
+
+    public Map<String, PhysicalDBConfig> loadPhysical() throws Exception;
 
 }

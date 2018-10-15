@@ -1,5 +1,6 @@
 package com.pphh.dfw;
 
+import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
 
 /**
@@ -11,7 +12,7 @@ import com.pphh.dfw.core.ds.LogicDBConfig;
 public class DaoFactory {
 
     private static Boolean isConfigLoaded = false;
-    private static GlobalDataSourceConfig instance = GlobalDataSourceConfig.getInstance();
+    private static IDataSourceConfig instance = GlobalDataSourceConfig.getInstance();
 
     public static Dao generate(String logicDb) throws Exception {
         if (!isConfigLoaded) {

@@ -1,6 +1,6 @@
 package com.pphh.dfw.core.transform;
 
-import com.pphh.dfw.core.sqlb.ISqlBuilder;
+import com.pphh.dfw.core.IEntity;
 
 import java.util.List;
 
@@ -12,6 +12,8 @@ import java.util.List;
  */
 public interface ITransformer {
 
-    List<ShardTask> generate(ISqlBuilder sqlBuilder);
+    <T> List<T> run(String sql, String dbName, Class<? extends IEntity> resultClz) throws Exception;
+
+    <T> ShardTaskResult<T> run(ShardTask<T> task, Class<? extends IEntity> resultClz);
 
 }

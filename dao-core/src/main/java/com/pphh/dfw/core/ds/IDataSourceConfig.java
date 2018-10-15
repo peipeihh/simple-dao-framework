@@ -8,6 +8,10 @@ package com.pphh.dfw.core.ds;
  */
 public interface IDataSourceConfig {
 
-    public LogicDBConfig getConfig(String id);
+    public IDataSourceConfig load() throws Exception;
+
+    public LogicDBConfig getLogicDBConfig(String id);
+
+    public PhysicalDBConfig getPhysicalDBConfigMap(String id);
 
 }

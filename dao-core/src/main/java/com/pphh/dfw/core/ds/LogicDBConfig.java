@@ -23,7 +23,7 @@ public class LogicDBConfig {
     private String tableShardColumn;
     private String tableName;
     private String tableSeparator;
-    private Map<String, PhysicalDBConfig> physicalDBConfigMap = new ConcurrentHashMap<>();
+    private Map<String, String> physicalDBShardMap = new ConcurrentHashMap<>();
 
     public String getId() {
         return id;
@@ -65,14 +65,6 @@ public class LogicDBConfig {
         this.tableSeparator = tableSeparator;
     }
 
-    public Map<String, PhysicalDBConfig> getPhysicalDBConfigMap() {
-        return physicalDBConfigMap;
-    }
-
-    public void setPhysicalDBConfigMap(Map<String, PhysicalDBConfig> physicalDBConfigMap) {
-        this.physicalDBConfigMap = physicalDBConfigMap;
-    }
-
     public ShardStrategy getShardStrategy() {
         return shardStrategy;
     }
@@ -97,20 +89,20 @@ public class LogicDBConfig {
         this.tableShardColumn = tableShardColumn;
     }
 
-    public Set<String> getPhysicalDBIdList() {
-        return physicalDBConfigMap.keySet();
-    }
-
-    public PhysicalDBConfig getPhysicalDBConfig(String id) {
-        return physicalDBConfigMap.get(id);
-    }
-
-    public void setPhysicalDBConfig(String id, PhysicalDBConfig dbConfig) {
-        if (id == null || dbConfig == null) {
+    public void setPhysicalDBMap(String dbShard, String physicalDbName) {
+        if (id == null || physicalDbName == null) {
             throw new NullPointerException("id/dbConfig couldn't be null.");
         }
 
-        this.physicalDBConfigMap.put(id, dbConfig);
+        this.physicalDBShardMap.put(dbShard, physicalDbName);
+    }
+
+    public String getPhysicalDbName(String dbShard) {
+        return this.physicalDBShardMap.get(dbShard);
+    }
+
+    public String getDefaultPhysicalDbName() {
+        return this.physicalDBShardMap.get("default");
     }
 
 }

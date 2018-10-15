@@ -1,5 +1,6 @@
 package com.pphh.dfw;
 
+import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -16,7 +17,7 @@ public class ConfigLoaderTest {
 
     @Test
     public void testConfigLoader() throws Exception {
-        GlobalDataSourceConfig instance = GlobalDataSourceConfig.getInstance().load();
+        IDataSourceConfig instance = GlobalDataSourceConfig.getInstance().load();
 
         PhysicalDBConfig physicalDBConfig = instance.getPhysicalDBConfigMap("db0");
 

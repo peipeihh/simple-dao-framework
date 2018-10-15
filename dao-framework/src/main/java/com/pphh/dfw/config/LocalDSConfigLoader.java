@@ -25,40 +25,6 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
     private static final String LOCAL_DB_POOL_FILE = "dfw-db-pool.properties";
 
 
-    @Override
-    public Map<String, LogicDBConfig> load() throws Exception {
-        Properties dbConfigProps = readProperty("/" + LOCAL_DB_CONFIG_FILE);
-        Properties dbPoolProps = readProperty("/" + LOCAL_DB_POOL_FILE);
-
-        // load logic db configuration
-        List logicPrefixes = Stream.of(dbConfigProps.getProperty("logic.databases").split(","))
-                .map(String::trim)
-                .map(prefix -> String.format("logic.%s", prefix))
-                .collect(Collectors.toList());
-        List<LogicDBConfig> logicDBConfigList = parseArray(dbConfigProps, logicPrefixes, this::mapLogicDBConfig);
-
-        Set phyPrefixes = new HashSet<>();
-        Map<String, PhysicalDBConfig> physicalDBConfigMap = new ConcurrentHashMap<>();
-        for (LogicDBConfig logicDb : logicDBConfigList) {
-            List<String> dbEntries = logicDb.getDbEntries();
-            for (String dbEntry : dbEntries) {
-                // load physical db configuration
-                if (!phyPrefixes.contains(dbEntry)) {
-                    PhysicalDBConfig physicalDb = parseObject(dbConfigProps, String.format("physical.%s", dbEntry), this::mapPhysicalDBConfig);
-                    physicalDb.setPoolProperties(dbPoolProps);
-                    physicalDBConfigMap.put(dbEntry, physicalDb);
-                    phyPrefixes.add(dbEntry);
-                }
-
-                // set physical db into logic db object
-                PhysicalDBConfig physicalDb = physicalDBConfigMap.get(dbEntry);
-                logicDb.setPhysicalDBConfig(dbEntry, physicalDb);
-            }
-        }
-
-        return ConvertUtils.map(logicDBConfigList, LogicDBConfig::getId);
-    }
-
     /**
      * 从配置列表中，根据所匹配的属性进行分组，通过map函数来解析出一组可用的对象列表
      *
@@ -86,15 +52,28 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
         return prefix.isEmpty() ? null : mapper.apply(propertyList, prefix);
     }
 
-    protected LogicDBConfig mapLogicDBConfig(Properties propertyList, String prefix) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    protected LogicDBConfig mapLogicDBConfig(Properties propertyList, String prefix) throws Exception {
         LogicDBConfig dbConfig = new LogicDBConfig();
         dbConfig.setId(prefix.replaceFirst("logic\\.", ""));
-        String[] dbEntries = propertyList.getProperty(prefix + ".dbEntries").split(",");
+
+        String dbEntriesProperty = propertyList.getProperty(prefix + ".dbEntries");
+        if (dbEntriesProperty == null || dbEntriesProperty.isEmpty()) {
+            throw new Exception("db entries is empty, please set the db entries in the config file at first");
+        }
+
+        String[] dbEntries = dbEntriesProperty.split(",");
         dbConfig.setDbEntries(Stream.of(dbEntries).map(String::trim).collect(Collectors.toList()));
         dbConfig.setDefaultDriverContext(propertyList.getProperty(prefix + ".defaultDriverContext"));
+        for (String dbEntry : dbEntries) {
+            String inDbShard = propertyList.getProperty(prefix + "." + dbEntry);
+            if (inDbShard != null) {
+                dbConfig.setPhysicalDBMap(inDbShard, dbEntry);
+            }
+        }
+        dbConfig.setPhysicalDBMap("default", dbEntries[0]);
 
         String shardStrategy = propertyList.getProperty(prefix + ".shardStrategy");
-        if (shardStrategy != null){
+        if (shardStrategy != null) {
             ShardStrategy strategy = (ShardStrategy) Class.forName(shardStrategy).newInstance();
             Properties settings = new Properties();
             settings.setProperty("tableName", propertyList.getProperty(prefix + ".tableName"));
@@ -112,14 +91,13 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
 
     protected PhysicalDBConfig mapPhysicalDBConfig(Properties propertyList, String prefix) {
         PhysicalDBConfig dbConfig = new PhysicalDBConfig();
-        dbConfig.setId(prefix.replaceFirst("pyshcial\\.", ""));
+        dbConfig.setId(prefix.replaceFirst("physical\\.", ""));
         dbConfig.setDriverType(propertyList.getProperty(prefix + ".driverType"));
         dbConfig.setHost(propertyList.getProperty(prefix + ".host"));
         dbConfig.setPort(propertyList.getProperty(prefix + ".port"));
         dbConfig.setUserName(propertyList.getProperty(prefix + ".userName"));
         dbConfig.setUserPwd(propertyList.getProperty(prefix + ".userPwd"));
         dbConfig.setDbName(propertyList.getProperty(prefix + ".dbName"));
-        dbConfig.setInShard(propertyList.getProperty(prefix + ".inShard"));
         return dbConfig;
     }
 
@@ -138,4 +116,29 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
         return props;
     }
 
+    @Override
+    public Map<String, LogicDBConfig> loadLogic() throws Exception {
+        Properties dbConfigProps = readProperty("/" + LOCAL_DB_CONFIG_FILE);
+
+        // load logic db configuration
+        List logicPrefixes = Stream.of(dbConfigProps.getProperty("logic.databases").split(","))
+                .map(String::trim)
+                .map(prefix -> String.format("logic.%s", prefix))
+                .collect(Collectors.toList());
+        List<LogicDBConfig> logicDBConfigList = parseArray(dbConfigProps, logicPrefixes, this::mapLogicDBConfig);
+        return ConvertUtils.map(logicDBConfigList, LogicDBConfig::getId);
+    }
+
+    @Override
+    public Map<String, PhysicalDBConfig> loadPhysical() throws Exception {
+        Properties dbConfigProps = readProperty("/" + LOCAL_DB_CONFIG_FILE);
+        Properties dbPoolProps = readProperty("/" + LOCAL_DB_POOL_FILE);
+
+        List<String> phyPrefixes = Stream.of(dbConfigProps.getProperty("physical.databases").split(","))
+                .map(String::trim)
+                .map(prefix -> String.format("physical.%s", prefix))
+                .collect(Collectors.toList());
+        List<PhysicalDBConfig> physicalDBConfigList = parseArray(dbConfigProps, phyPrefixes, this::mapPhysicalDBConfig);
+        return ConvertUtils.map(physicalDBConfigList, PhysicalDBConfig::getId);
+    }
 }

@@ -1,9 +1,12 @@
 package com.pphh.dfw.core.sqlb;
 
+import com.pphh.dfw.core.IEntity;
 import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
+
+import java.util.List;
 
 
 /**
@@ -77,12 +80,28 @@ public interface ISqlBuilder {
 
     ISqlBuilder appendWhen(Boolean isAppend, Object... clauses);
 
-    ISqlBuilder into(Class clazz);
-
     IHints hints();
 
     String build();
 
     String buildOn(String logicDb);
+
+    /**
+     * 执行select语句
+     *
+     * @param clazz
+     * @param <T>
+     * @return 获取的实体对象
+     * @throws Exception
+     */
+    <T> List<T> fetchInto(Class<? extends IEntity> clazz) throws Exception;
+
+    /**
+     * 执行insert/update/delete语句
+     *
+     * @return 执行结果
+     * @throws Exception
+     */
+    int execute() throws Exception;
 
 }

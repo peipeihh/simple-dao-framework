@@ -19,7 +19,6 @@ public class PhysicalDBConfig {
     private String userName;
     private String userPwd;
     private String dbName;
-    private String inShard;
     private String connectionUrl;
     private String connectionProperties;
     private Properties poolProperties = new Properties();
@@ -100,14 +99,6 @@ public class PhysicalDBConfig {
     public void setConnectionProperties(String connectionProperties) {
         this.poolProperties.setProperty("connectionProperties", connectionProperties);
         this.connectionProperties = connectionProperties;
-    }
-
-    public String getInShard() {
-        return inShard;
-    }
-
-    public void setInShard(String inShard) {
-        this.inShard = inShard;
     }
 
     public Properties getPoolProperties() {

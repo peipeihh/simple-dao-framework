@@ -1,6 +1,7 @@
 package com.pphh.dfw.config;
 
 import com.pphh.dfw.core.ds.LogicDBConfig;
+import com.pphh.dfw.core.ds.PhysicalDBConfig;
 
 import java.util.Map;
 
@@ -13,9 +14,12 @@ import java.util.Map;
 public class RemoteDSConfigLoader implements DataSourceConfigLoader {
 
     @Override
-    public Map<String, LogicDBConfig> load() {
-        // read data source configuration from remote config server
+    public Map<String, LogicDBConfig> loadLogic() throws Exception {
         return null;
     }
 
+    @Override
+    public Map<String, PhysicalDBConfig> loadPhysical() throws Exception {
+        return null;
+    }
 }
