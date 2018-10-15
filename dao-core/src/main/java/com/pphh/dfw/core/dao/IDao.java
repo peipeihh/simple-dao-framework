@@ -41,6 +41,8 @@ public interface IDao {
 
     <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder);
 
+    //<T extends IEntity> Page<T> queryByPage(T entity, Object pageable);
+
     int execute(Function function);
 
     int run(ISqlBuilder sqlBuilder);

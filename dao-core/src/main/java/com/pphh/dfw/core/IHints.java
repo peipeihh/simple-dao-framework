@@ -1,6 +1,7 @@
 package com.pphh.dfw.core;
 
 import com.pphh.dfw.core.constant.HintEnum;
+import com.pphh.dfw.core.constant.SqlProviderEnum;
 
 /**
  * Please add description here.
@@ -15,6 +16,8 @@ public interface IHints {
     IHints insertId();
 
     IHints setIdBack();
+
+    IHints sqlDialect(SqlProviderEnum dialect);
 
     IHints inDbShard(Object value);
 

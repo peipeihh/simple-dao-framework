@@ -6,7 +6,7 @@ package com.pphh.dfw.core.constant;
  * @author huangyinhuang
  * @date 9/26/2018
  */
-public enum DriverProviderEnum {
+public enum SqlProviderEnum {
 
     SQLSERVER,
     MYSQL

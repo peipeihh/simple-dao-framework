@@ -2,6 +2,7 @@ package com.pphh.dfw;
 
 import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.constant.HintEnum;
+import com.pphh.dfw.core.constant.SqlProviderEnum;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +32,12 @@ public class Hints implements IHints {
     @Override
     public IHints setIdBack() {
         hints.put(HintEnum.SET_ID_BACK, Boolean.TRUE);
+        return this;
+    }
+
+    @Override
+    public IHints sqlDialect(SqlProviderEnum dialect) {
+        hints.put(HintEnum.SQL_DIALECT, dialect);
         return this;
     }
 

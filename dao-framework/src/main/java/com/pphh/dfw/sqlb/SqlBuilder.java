@@ -6,10 +6,8 @@ import com.pphh.dfw.GlobalDataSourceConfig;
 import com.pphh.dfw.Hints;
 import com.pphh.dfw.core.ShardStrategy;
 import com.pphh.dfw.core.constant.HintEnum;
-import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.ds.LogicDBConfig;
-import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
 import com.pphh.dfw.core.table.Expression;
@@ -29,8 +27,9 @@ import java.util.List;
  */
 public class SqlBuilder implements ISqlBuilder {
 
-    IHints hints = new Hints();
-    List<ISqlSegement> sqlSegements = new LinkedList<>();
+    private IHints hints = new Hints();
+    private List<ISqlSegement> sqlSegements = new LinkedList<>();
+    private Class entityClazz;
 
     private List<ISqlSegement> comma(ISqlSegement... segements) {
         return concat(COMMA, segements);
@@ -237,7 +236,8 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public ISqlBuilder into(Class clazz) {
-        return null;
+        this.entityClazz = clazz;
+        return this;
     }
 
     @Override
@@ -252,7 +252,6 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public String buildOn(String logicDb) {
-
         // 加载逻辑数据库配置
         String tableShard = null;
         String dbShard = null;
@@ -293,7 +292,6 @@ public class SqlBuilder implements ISqlBuilder {
             }
         }
 
-
         // 切换分库分表之后的sql拼接字段
         List<ISqlSegement> shardSqlSegements = new LinkedList<>();
 
@@ -312,14 +310,12 @@ public class SqlBuilder implements ISqlBuilder {
             }
         }
 
-
         if (dbShard != null) {
             shardSqlSegements.add(new Expression("-- " + dbShard));
         }
 
         return build(shardSqlSegements);
     }
-
 
     private String build(List<ISqlSegement> segements) {
         StringBuilder builder = new StringBuilder();

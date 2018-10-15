@@ -1,6 +1,6 @@
 package com.pphh.dfw.core.ds;
 
-import com.pphh.dfw.core.constant.DriverProviderEnum;
+import com.pphh.dfw.core.constant.SqlProviderEnum;
 
 import java.util.Properties;
 
@@ -85,9 +85,9 @@ public class PhysicalDBConfig {
 
     public String getConnectionUrl() {
         String connectionUrl = null;
-        if (DriverProviderEnum.MYSQL.name().equalsIgnoreCase(this.driverType)) {
+        if (SqlProviderEnum.MYSQL.name().equalsIgnoreCase(this.driverType)) {
             connectionUrl = String.format("jdbc:mysql://%s:%s/%s", host, port, dbName);
-        } else if (DriverProviderEnum.SQLSERVER.name().equalsIgnoreCase(this.driverType)) {
+        } else if (SqlProviderEnum.SQLSERVER.name().equalsIgnoreCase(this.driverType)) {
             connectionUrl = String.format("jdbc:sqlserver://%s:%s;DatabaseName=%s", host, port, dbName);
         }
         return connectionUrl;
