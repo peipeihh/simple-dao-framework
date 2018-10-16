@@ -3,6 +3,7 @@ package com.pphh.dfw.table;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,13 +42,13 @@ public class GenericTable implements ITable {
         return String.format("`%s`", this.name);
     }
 
-    public ITableField insertFields(String field, Object value) {
-        return insertFields(field, value, Boolean.FALSE);
+    public ITableField insertFields(String fieldName, String fieldDef, Type fieldType, Object filedValue) {
+        return insertFields(fieldName, fieldDef, fieldType, filedValue, Boolean.FALSE);
     }
 
-    public ITableField insertFields(String field, Object value, Boolean isPrimaryKey) {
-        TableField f = new TableField(field);
-        fields.put(f, value);
+    public ITableField insertFields(String fieldName, String fieldDef, Type fieldType, Object filedValue, Boolean isPrimaryKey) {
+        TableField f = new TableField(fieldName, fieldDef, fieldType, filedValue);
+        fields.put(f, "");
         if (isPrimaryKey) {
             this.primaryField = f;
         }
@@ -55,7 +56,8 @@ public class GenericTable implements ITable {
     }
 
     public Object getFieldValue(ITableField field) {
-        return fields.get(field);
+        //return fields.get(field);
+        return field.getFieldValue();
     }
 
     public Object getFieldValue(String field) {
@@ -63,7 +65,7 @@ public class GenericTable implements ITable {
         for (Map.Entry<AbstractTableField, Object> entry : this.fields.entrySet()) {
             AbstractTableField f = entry.getKey();
             if (f.getFieldName().equals(field)) {
-                value = entry.getValue();
+                value = f.getFieldValue();
                 break;
             }
         }

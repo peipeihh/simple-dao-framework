@@ -12,4 +12,6 @@ public interface IEntityParser<T extends ITable> {
 
     T parse(IEntity iEntity);
 
+    T parse(Class<? extends IEntity> clazz);
+
 }

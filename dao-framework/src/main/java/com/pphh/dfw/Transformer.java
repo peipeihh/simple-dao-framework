@@ -4,12 +4,16 @@ import com.pphh.dfw.core.IEntity;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import com.pphh.dfw.core.jdbc.IDataSource;
+import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.core.transform.ITransformer;
 import com.pphh.dfw.core.transform.ShardTask;
 import com.pphh.dfw.core.transform.ShardTaskResult;
 import com.pphh.dfw.jdbc.TomcatDataSource;
+import com.pphh.dfw.table.GenericTable;
+import com.pphh.dfw.table.TableField;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,17 +58,22 @@ public class Transformer implements ITransformer {
     private <T> List<T> convert(ResultSet rs, Class<? extends T> resultClz) throws SQLException {
         List<T> results = new ArrayList<>();
 
+        EntityParser entityParser = new EntityParser();
+        GenericTable table = entityParser.parse((Class<? extends IEntity>) resultClz);
+
         while (rs.next()) {
             try {
                 T entity = resultClz.newInstance();
 
-                Field f = resultClz.getDeclaredField("id");
-                f.setAccessible(true);
-                f.set(entity, rs.getInt("id"));
+                List<ITableField> fields = table.getFields();
+                for (ITableField field : fields) {
+                    String fieldName = field.getFieldName();
+                    String fieldDef = field.getFieldDefinition();
+                    Type fieldType = field.getFieldType();
 
-                f = resultClz.getDeclaredField("name");
-                f.setAccessible(true);
-                f.set(entity, rs.getString("name"));
+                    Field f = resultClz.getDeclaredField(fieldName);
+                    setFieldValue(f, fieldDef, fieldType, entity, rs);
+                }
 
                 results.add(entity);
             } catch (InstantiationException | IllegalAccessException | NoSuchFieldException e) {
@@ -74,5 +83,24 @@ public class Transformer implements ITransformer {
 
         return results;
     }
+
+    private void setFieldValue(Field f, String fieldDef, Type fieldType, Object target, ResultSet rs) throws SQLException, IllegalAccessException {
+        f.setAccessible(true);
+        switch (fieldType.getTypeName()) {
+            case "java.lang.Integer":
+                f.set(target, rs.getInt(fieldDef));
+                break;
+            case "java.lang.String":
+                f.set(target, rs.getString(fieldDef));
+                break;
+            case "java.lang.Long":
+                f.set(target, rs.getLong(fieldDef));
+                break;
+            case "java.sql.Date":
+                f.set(target, rs.getDate(fieldDef));
+            default:
+        }
+    }
+
 
 }

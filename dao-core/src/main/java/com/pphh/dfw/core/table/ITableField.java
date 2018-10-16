@@ -2,6 +2,8 @@ package com.pphh.dfw.core.table;
 
 import com.pphh.dfw.core.sqlb.ISqlSegement;
 
+import java.lang.reflect.Type;
+
 /**
  * Please add description here.
  *
@@ -11,6 +13,12 @@ import com.pphh.dfw.core.sqlb.ISqlSegement;
 public interface ITableField extends ISqlSegement {
 
     String getFieldName();
+
+    String getFieldDefinition();
+
+    Type getFieldType();
+
+    Object getFieldValue();
 
     Expression equal(Object value);
 
