@@ -94,7 +94,7 @@ public interface ISqlBuilder {
      * @return 获取的实体对象
      * @throws Exception
      */
-    <T> List<T> fetchInto(Class<? extends IEntity> clazz) throws Exception;
+    <T> List<T> fetchInto(Class<? extends T> clazz) throws Exception;
 
     /**
      * 执行insert/update/delete语句

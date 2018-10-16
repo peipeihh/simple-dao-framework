@@ -1,5 +1,6 @@
 package com.pphh.dfw;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -28,7 +29,9 @@ public class DaoTest extends BaseTest {
     public void testQuery() throws Exception {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setId(1);
-        dao.queryByPk(orderEntity);
+        OrderEntity entity = dao.queryByPk(orderEntity);
+        Assert.assertNotNull(entity);
+        Assert.assertTrue(entity.getId().equals(1));
     }
 
 

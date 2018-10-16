@@ -30,11 +30,11 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> T queryByPk(T entity) {
+    public <T> T queryByPk(T entity) {
         T result = null;
 
         // parse entity, 获取entity definition
-        GenericTable table = this.entityParser.parse(entity);
+        GenericTable table = this.entityParser.parse((IEntity) entity);
 
         if (table != null) {
             // 主键Id + 主键
@@ -49,7 +49,7 @@ public class Dao implements IDao {
             System.out.println(sql);
 
             try {
-                List<T> results = sqlBuilder.fetchInto(entity.getClass());
+                List<T> results = sqlBuilder.fetchInto((Class<? extends T>) entity.getClass());
                 if (results.size() > 0) {
                     result = results.get(0);
                 }
@@ -58,7 +58,7 @@ public class Dao implements IDao {
             }
         }
 
-        return null;
+        return result;
     }
 
     @Override

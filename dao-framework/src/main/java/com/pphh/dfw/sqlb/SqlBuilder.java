@@ -329,7 +329,7 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public <T> List<T> fetchInto(Class<? extends IEntity> clazz) throws Exception {
+    public <T> List<T> fetchInto(Class<? extends T> clazz) throws Exception {
         String sql = this.buildOn(logicDb);
 
         LogicDBConfig logicDBConfig = GlobalDataSourceConfig.getInstance().getLogicDBConfig(logicDb);

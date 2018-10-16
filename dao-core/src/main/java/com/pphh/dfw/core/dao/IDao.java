@@ -15,7 +15,7 @@ import java.util.function.Function;
  */
 public interface IDao {
 
-    <T extends IEntity> T queryByPk(T entity);
+    <T> T queryByPk(T entity);
 
     <T extends IEntity> List<T> queryBySample(T entity);
 
