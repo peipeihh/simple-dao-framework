@@ -134,7 +134,8 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public ISqlBuilder orderBy(ITableField... fields) {
+    public ISqlBuilder orderBy(Expression... fields) {
+        this.append(ORDER_BY, comma(fields));
         return this;
     }
 

@@ -46,6 +46,18 @@ public class SqlBuilderTest extends BaseTest {
 
         sql = select().from(order).where();
         Assert.assertEquals("SELECT * FROM `order` WHERE", sql.build());
+
+        sql = select().from(order).orderBy(order.id.desc());
+        Assert.assertEquals("SELECT * FROM `order` ORDER BY `id` DESC", sql.build());
+
+        sql = select().from(order).orderBy(order.id.desc(), order.city_id.asc());
+        Assert.assertEquals("SELECT * FROM `order` ORDER BY `id` DESC , `city_id` ASC", sql.build());
+
+        sql = selectDistinct(order.id, order.name).from(order);
+        Assert.assertEquals("SELECT DISTINCT `id` , `name` FROM `order`", sql.build());
+
+        sql = selectCount().from(order);
+        Assert.assertEquals("SELECT COUNT(1) FROM `order`", sql.build());
     }
 
     /**
@@ -79,6 +91,16 @@ public class SqlBuilderTest extends BaseTest {
 
         sql = deleteFrom(order).where(order.id.equal(1), order.name.equal("apple"));
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' , `name` = 'apple'", sql.build());
+    }
+
+    public void testWhere() {
+        // TODO test the where statement
+        // where in
+        // where and
+        // where or
+        // where not
+        // top
+        // limit
     }
 
 }

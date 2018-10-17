@@ -75,12 +75,12 @@ public abstract class AbstractTableField implements ITableField {
 
     @Override
     public Expression in(Object value) {
-        return new Expression(String.format("`%s` in %s", fieldName, value));
+        return new Expression(String.format("`%s` IN %s", fieldName, value));
     }
 
     @Override
     public Expression notIn(Object value) {
-        return new Expression(String.format("`%s` <= %s", fieldName, value));
+        return new Expression(String.format("`%s` NOT IN %s", fieldName, value));
     }
 
     @Override
@@ -103,6 +103,17 @@ public abstract class AbstractTableField implements ITableField {
         return new Expression(String.format("`%s` IS NOT NULL", fieldName));
     }
 
+    @Override
+    public Expression asc() {
+        return new Expression(String.format("`%s` ASC", fieldName));
+    }
+
+    @Override
+    public Expression desc() {
+        return new Expression(String.format("`%s` DESC", fieldName));
+    }
+
+    @Override
     public abstract String buildSql();
 
 }

@@ -46,4 +46,8 @@ public interface ITableField extends ISqlSegement {
 
     Expression isNotNull(Object value);
 
+    Expression asc();
+
+    Expression desc();
+
 }

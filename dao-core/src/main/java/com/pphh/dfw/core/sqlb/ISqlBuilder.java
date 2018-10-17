@@ -42,7 +42,7 @@ public interface ISqlBuilder {
 
     ISqlBuilder deleteFrom(ITable table);
 
-    ISqlBuilder orderBy(ITableField... fields);
+    ISqlBuilder orderBy(Expression... fields);
 
     ISqlBuilder groupBy(ITableField... fields);
 
