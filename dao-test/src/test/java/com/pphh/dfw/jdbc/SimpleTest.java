@@ -41,7 +41,7 @@ public class SimpleTest {
                         "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
         DataSource dataSource = new DataSource();
         dataSource.setPoolProperties(p);
-        TestConnection.testConnection(dataSource);
+        TestConnection.testConnection(dataSource, "select * from `database0`.order");
     }
 
 }

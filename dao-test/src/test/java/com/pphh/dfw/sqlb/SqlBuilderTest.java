@@ -17,6 +17,25 @@ public class SqlBuilderTest extends BaseTest {
 
     private ISqlBuilder sql;
 
+    /**
+     * 通过append实现简单的sql语句叠加
+     */
+    @Test
+    public void testPlainSql() {
+        sql = sqlBuilder().append("DELETE FROM `order`");
+        Assert.assertEquals("DELETE FROM `order`", sql.build());
+
+        sql = sqlBuilder().append("DELETE FROM `order`");
+        Assert.assertEquals("DELETE FROM `order`", sql.buildOn(noShardDao));
+
+        String insertSql = String.format("INSERT INTO `order` (`name`, `city_id` , `country_id`) VALUES ( '%s' , '%s' , '%s' )", "apple", 1, 10);
+        sql = sqlBuilder().append(insertSql);
+        Assert.assertEquals(insertSql, sql.build());
+    }
+
+    /**
+     * sql查询
+     */
     @Test
     public void testSelect() {
         sql = select(order.id, order.name).from(order);
@@ -29,12 +48,18 @@ public class SqlBuilderTest extends BaseTest {
         Assert.assertEquals("SELECT * FROM `order` WHERE", sql.build());
     }
 
+    /**
+     * sql插入
+     */
     @Test
     public void testInsert() {
         sql = insertInto(order, order.id, order.name).values("1", "apple");
         Assert.assertEquals("INSERT INTO `order` ( `id` , `name` ) VALUES ( '1' , 'apple' )", sql.build());
     }
 
+    /**
+     * sql更新
+     */
     @Test
     public void testUpdate() {
         sql = update(order).set(order.id.equal(2), order.name.equal("banana"));
@@ -54,19 +79,6 @@ public class SqlBuilderTest extends BaseTest {
 
         sql = deleteFrom(order).where(order.id.equal(1), order.name.equal("apple"));
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' , `name` = 'apple'", sql.build());
-    }
-
-    @Test
-    public void testPlainSql() {
-        sql = sqlBuilder().append("DELETE FROM `order`");
-        Assert.assertEquals("DELETE FROM `order`", sql.build());
-
-        sql = sqlBuilder().append("DELETE FROM `order`");
-        Assert.assertEquals("DELETE FROM `order`", sql.buildOn(noShardDao));
-
-        String insertSql = String.format("INSERT INTO `order` (`name`, `city_id` , `country_id`) VALUES ( '%s' , '%s' , '%s' )", "apple", 1, 10);
-        sql = sqlBuilder().append(insertSql);
-        Assert.assertEquals(insertSql, sql.build());
     }
 
 }

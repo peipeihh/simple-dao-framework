@@ -15,10 +15,13 @@ import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
  * @author huangyinhuang
  * @date 9/30/2018
  */
-public class SqlBuilderOnDaoTest extends BaseTest {
+public class SqlBuilderSimpleTest extends BaseTest {
 
     private ISqlBuilder sql;
 
+    /**
+     * 实现表的分片查询
+     */
     @Ignore
     @Test
     public void test() {
@@ -27,6 +30,11 @@ public class SqlBuilderOnDaoTest extends BaseTest {
         Assert.assertNotNull("SELECT `id` , `name` FROM `order_0`", sql.buildOn(tableShardDao));
     }
 
+    /**
+     * 实现表的清理
+     *
+     * @throws Exception
+     */
     @Test
     public void testCleanUp() throws Exception {
         sql = sqlBuilder().append("DELETE FROM `order`");
@@ -34,12 +42,16 @@ public class SqlBuilderOnDaoTest extends BaseTest {
         Assert.assertTrue(result >= 0);
     }
 
+    /**
+     * 添加表记录
+     *
+     * @throws Exception
+     */
     @Test
     public void testInsertRecord() throws Exception {
         String insertSql = String.format("INSERT INTO `order` (`name`, `city_id` , `country_id`) VALUES ( '%s' , '%s' , '%s' )", "apple", 1, 10);
         sql = sqlBuilder().append(insertSql);
         int result = noShardDao.run(sql);
-
         Assert.assertEquals(1, result);
     }
 

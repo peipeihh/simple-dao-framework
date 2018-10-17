@@ -11,16 +11,16 @@ import java.sql.Statement;
  * Please add description here.
  *
  * @author huangyinhuang
- * @date 9/26/2018
+ * @date 10/17/2018
  */
 public class TestConnection {
 
-    public static void testConnection(DataSource dataSource) throws SQLException {
+    public static void testConnection(DataSource dataSource, String testSql) throws SQLException {
         Connection con = null;
         try {
             con = dataSource.getConnection();
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("select * from `database0`.order");
+            ResultSet rs = st.executeQuery(testSql);
             int cnt = 1;
             while (rs.next()) {
                 System.out.println((cnt++)

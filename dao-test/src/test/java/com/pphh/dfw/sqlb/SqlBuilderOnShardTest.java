@@ -2,13 +2,12 @@ package com.pphh.dfw.sqlb;
 
 import com.pphh.dfw.BaseTest;
 
-import static com.pphh.dfw.sqlb.SqlStarter.deleteFrom;
-import static com.pphh.dfw.sqlb.SqlStarter.select;
-
 import com.pphh.dfw.Hints;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static com.pphh.dfw.sqlb.SqlStarter.*;
 
 /**
  * Please add description here.
@@ -55,6 +54,55 @@ public class SqlBuilderOnShardTest extends BaseTest {
 
     }
 
+    @Test
+    public void testInsert() {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                ISqlBuilder sql = insertInto(order, order.id, order.name).values("1", "apple").hints(new Hints().dbShardValue(i).tableShardValue(j));
+
+                // noShard
+                String expectedSql = "INSERT INTO `order` ( `id` , `name` ) VALUES ( '1' , 'apple' )";
+                Assert.assertEquals(expectedSql, sql.buildOn(noShardDao));
+
+                // tableShard
+                expectedSql = String.format("INSERT INTO `order_%s` ( `id` , `name` ) VALUES ( '1' , 'apple' )", j % 3);
+                Assert.assertEquals(expectedSql, sql.buildOn(tableShardDao));
+
+                // dbShard
+                expectedSql = String.format("INSERT INTO `order` ( `id` , `name` ) VALUES ( '1' , 'apple' ) -- %s", i % 2);
+                Assert.assertEquals(expectedSql, sql.buildOn(dbShardDao));
+
+                // tableDbShard
+                expectedSql = String.format("INSERT INTO `order_%s` ( `id` , `name` ) VALUES ( '1' , 'apple' ) -- %s", j % 3, i % 2);
+                Assert.assertEquals(expectedSql, sql.buildOn(tableDbShardDao));
+            }
+        }
+    }
+
+    @Test
+    public void testUpdate() {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                ISqlBuilder sql = update(order).set(order.id.equal(2), order.name.equal("banana")).hints(new Hints().dbShardValue(i).tableShardValue(j));
+
+                // noShard
+                String expectedSql = "UPDATE `order` SET `id` = '2' , `name` = 'banana'";
+                Assert.assertEquals(expectedSql, sql.buildOn(noShardDao));
+
+                // tableShard
+                expectedSql = String.format("UPDATE `order_%s` SET `id` = '2' , `name` = 'banana'", j % 3);
+                Assert.assertEquals(expectedSql, sql.buildOn(tableShardDao));
+
+                // dbShard
+                expectedSql = String.format("UPDATE `order` SET `id` = '2' , `name` = 'banana' -- %s", i % 2);
+                Assert.assertEquals(expectedSql, sql.buildOn(dbShardDao));
+
+                // tableDbShard
+                expectedSql = String.format("UPDATE `order_%s` SET `id` = '2' , `name` = 'banana' -- %s", j % 3, i % 2);
+                Assert.assertEquals(expectedSql, sql.buildOn(tableDbShardDao));
+            }
+        }
+    }
 
     @Test
     public void testDelete() {
