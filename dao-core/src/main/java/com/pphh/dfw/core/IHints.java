@@ -27,6 +27,8 @@ public interface IHints {
 
     IHints tableShardValue(Object value);
 
+    IHints into(Class clazz);
+
     Object getHintValue(HintEnum hintEnum);
 
     Boolean hasHint(HintEnum hintEnum);

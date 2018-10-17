@@ -1,7 +1,7 @@
 package com.pphh.dfw.core.sqlb;
 
-import com.pphh.dfw.core.IEntity;
 import com.pphh.dfw.core.IHints;
+import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
@@ -80,11 +80,15 @@ public interface ISqlBuilder {
 
     ISqlBuilder appendWhen(Boolean isAppend, Object... clauses);
 
-    IHints hints();
+    ISqlBuilder hints(IHints hints);
+
+    ISqlBuilder into(Class clazz);
+
+    IHints getHints();
 
     String build();
 
-    String buildOn(String logicDb);
+    String buildOn(IDao dao);
 
     /**
      * 执行select语句

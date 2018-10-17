@@ -66,6 +66,12 @@ public class Hints implements IHints {
     }
 
     @Override
+    public IHints into(Class clazz) {
+        hints.put(HintEnum.POJO_CLASS, clazz);
+        return this;
+    }
+
+    @Override
     public Object getHintValue(HintEnum hintEnum) {
         return hints.get(hintEnum);
     }

@@ -55,11 +55,6 @@ public class GenericTable implements ITable {
         return f;
     }
 
-    public Object getFieldValue(ITableField field) {
-        //return fields.get(field);
-        return field.getFieldValue();
-    }
-
     public Object getFieldValue(String field) {
         Object value = null;
         for (Map.Entry<AbstractTableField, Object> entry : this.fields.entrySet()) {

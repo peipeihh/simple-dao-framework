@@ -1,8 +1,11 @@
 package com.pphh.dfw;
 
-import com.pphh.dfw.sqlb.SqlBuilder;
+import com.pphh.dfw.core.dao.IDao;
+import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 
 /**
  * Please add description here.
@@ -17,14 +20,27 @@ public abstract class BaseTest {
     protected static final String LOGIC_DB_NO_SHARD = "noShard";
     protected static final String LOGIC_DB_DB_SHARD = "dbShard";
     protected static final String LOGIC_DB_TABLE_SHARD = "tableShard";
-    protected static final String LOGIC_DB_DB_TABLE_SHARD = "tableDbShard";
+    protected static final String LOGIC_DB_TABLE_DB_SHARD = "tableDbShard";
     protected static final String TABLE_NAME = Tables.ORDER.getName();
-    protected SqlBuilder sqlBuilder;
+    protected ISqlBuilder builder;
     protected OrderTable order = Tables.ORDER;
+    protected Dao noShardDao;
+    protected Dao dbShardDao;
+    protected Dao tableShardDao;
+    protected Dao tableDbShardDao;
+
+    public BaseTest() {
+        try {
+            noShardDao = DaoFactory.generate(LOGIC_DB_NO_SHARD);
+            dbShardDao = DaoFactory.generate(LOGIC_DB_DB_SHARD);
+            tableShardDao = DaoFactory.generate(LOGIC_DB_TABLE_SHARD);
+            tableDbShardDao = DaoFactory.generate(LOGIC_DB_TABLE_DB_SHARD);
+        } catch (Exception ignored) {
+        }
+    }
 
     @BeforeClass
     public static void setUp() {
-
     }
 
     @AfterClass
@@ -37,17 +53,15 @@ public abstract class BaseTest {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 statements[j] = String.format("DELETE FROM `%s_%s`", TABLE_NAME, j);
-                execute(LOGIC_DB_DB_TABLE_SHARD, statements[j], i, j);
+                execute(tableDbShardDao, statements[j], i, j);
             }
             statements[TABLE_MOD] = String.format("DELETE FROM `%s`", TABLE_NAME);
-            execute(LOGIC_DB_NO_SHARD, statements[TABLE_MOD], 0, 0);
+            execute(noShardDao, statements[TABLE_MOD], 0, 0);
         }
     }
 
-    private void execute(String logicDb, String sql, int dbShard, int tableShard) throws Exception {
-        sqlBuilder = new SqlBuilder(logicDb);
-        sqlBuilder.hints().inDbShard(dbShard).inTableShard(tableShard);
-        sqlBuilder.append(sql).execute();
+    private void execute(IDao dao, String sql, int dbShard, int tableShard) throws Exception {
+        dao.run(sqlBuilder().append(sql).hints(new Hints().inDbShard(dbShard).inTableShard(tableShard)));
     }
 
 }

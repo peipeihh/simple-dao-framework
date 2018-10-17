@@ -4,10 +4,10 @@ import static com.pphh.dfw.core.sqlb.SqlConstant.*;
 
 import com.pphh.dfw.GlobalDataSourceConfig;
 import com.pphh.dfw.Hints;
-import com.pphh.dfw.Transformer;
 import com.pphh.dfw.core.ShardStrategy;
 import com.pphh.dfw.core.constant.HintEnum;
 import com.pphh.dfw.core.IHints;
+import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
@@ -31,19 +31,11 @@ public class SqlBuilder implements ISqlBuilder {
 
     private IHints hints = new Hints();
     private List<ISqlSegement> sqlSegements = new LinkedList<>();
-    private Class entityClazz;
-    private Transformer transformer = new Transformer();
-    private String logicDb;
 
     public SqlBuilder() {
-
     }
 
-    public SqlBuilder(String logicDb) {
-        this.logicDb = logicDb;
-    }
-
-    private List<ISqlSegement> comma(ISqlSegement... segements) {
+    protected List<ISqlSegement> comma(ISqlSegement... segements) {
         return concat(COMMA, segements);
     }
 
@@ -247,7 +239,19 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public IHints hints() {
+    public ISqlBuilder hints(IHints hints) {
+        this.hints = hints;
+        return this;
+    }
+
+    @Override
+    public ISqlBuilder into(Class clazz) {
+        this.hints.into(clazz);
+        return this;
+    }
+
+    @Override
+    public IHints getHints() {
         return this.hints;
     }
 
@@ -257,7 +261,21 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public String buildOn(String logicDb) {
+    public String buildOn(IDao dao) {
+        return buildOn(dao.getLogicName());
+    }
+
+    @Override
+    public <T> List<T> fetchInto(Class<? extends T> clazz) throws Exception {
+        return null;
+    }
+
+    @Override
+    public int execute() throws Exception {
+        return 0;
+    }
+
+    private String buildOn(String logicDb) {
         // 加载逻辑数据库配置
         String tableShard = null;
         String dbShard = null;
@@ -321,52 +339,6 @@ public class SqlBuilder implements ISqlBuilder {
         }
 
         return build(shardSqlSegements);
-    }
-
-    @Override
-    public <T> List<T> fetchInto(Class<? extends T> clazz) throws Exception {
-        if (logicDb == null || logicDb.isEmpty()) {
-            throw new Exception("logic db is empty, please specifiy logic db name before execution.");
-        }
-
-        String sql = this.buildOn(logicDb);
-        String sqlStatement;
-        String dbName;
-        LogicDBConfig logicDBConfig = GlobalDataSourceConfig.getInstance().getLogicDBConfig(logicDb);
-        if (sql.contains("--")) {
-            String[] strArr = sql.split("--");
-            sqlStatement = strArr[0];
-            String dbShard = strArr[1].trim();
-            dbName = logicDBConfig.getPhysicalDbName(dbShard);
-        } else {
-            sqlStatement = sql;
-            dbName = logicDBConfig.getDefaultPhysicalDbName();
-        }
-
-        return transformer.run(sqlStatement, dbName, clazz);
-    }
-
-    @Override
-    public int execute() throws Exception {
-        if (logicDb == null || logicDb.isEmpty()) {
-            throw new Exception("logic db is empty, please specifiy logic db name before execution.");
-        }
-
-        String sql = this.buildOn(logicDb);
-        String sqlStatement;
-        String dbName;
-        LogicDBConfig logicDBConfig = GlobalDataSourceConfig.getInstance().getLogicDBConfig(logicDb);
-        if (sql.contains("--")) {
-            String[] strArr = sql.split("--");
-            sqlStatement = strArr[0];
-            String dbShard = strArr[1].trim();
-            dbName = logicDBConfig.getPhysicalDbName(dbShard);
-        } else {
-            sqlStatement = sql;
-            dbName = logicDBConfig.getDefaultPhysicalDbName();
-        }
-
-        return transformer.run(sqlStatement, dbName);
     }
 
     private String build(List<ISqlSegement> segements) {

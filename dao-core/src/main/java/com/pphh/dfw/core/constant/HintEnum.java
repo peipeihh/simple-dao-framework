@@ -15,6 +15,7 @@ public enum HintEnum {
     TABLE_SHARD,
     INSERT_ID,
     SET_ID_BACK,
-    SQL_DIALECT
+    SQL_DIALECT,
+    POJO_CLASS
 
 }

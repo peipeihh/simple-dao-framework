@@ -1,13 +1,11 @@
 package com.pphh.dfw.shard;
 
-import com.pphh.dfw.BaseTest;
-import com.pphh.dfw.Dao;
-import com.pphh.dfw.DaoFactory;
-import com.pphh.dfw.OrderEntity;
-import com.pphh.dfw.sqlb.SqlBuilder;
+import com.pphh.dfw.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 
 /**
  * Please add description here.
@@ -30,9 +28,8 @@ public class TableShardTest extends BaseTest {
         for (int j = 0; j < TABLE_MOD; j++) {
             for (int k = 0; k < TABLE_MOD; k++) {
                 String sql = String.format("INSERT INTO `order_%d` (`id`, `name`, `city_id`, `country_id`) VALUES ('%s', '%s', '%s', '%s')", j, k + 1, "apple", j, j * 10);
-                sqlBuilder = new SqlBuilder(LOGIC_DB_DB_TABLE_SHARD);
-                sqlBuilder.hints().inDbShard(0).inTableShard(j);
-                sqlBuilder.append(sql).execute();
+                builder = sqlBuilder().append(sql).hints(new Hints().inDbShard(0).inTableShard(j));
+                tableDbShardDao.run(builder);
             }
         }
     }

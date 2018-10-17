@@ -1,14 +1,13 @@
 package com.pphh.dfw.shard;
 
-import com.pphh.dfw.BaseTest;
-import com.pphh.dfw.Dao;
-import com.pphh.dfw.DaoFactory;
-import com.pphh.dfw.OrderEntity;
-import com.pphh.dfw.sqlb.SqlBuilder;
+import com.pphh.dfw.*;
+import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 
 /**
  * Please add description here.
@@ -21,7 +20,7 @@ public class DbTableShardTest extends BaseTest {
     private Dao dao;
 
     public DbTableShardTest() throws Exception {
-        dao = DaoFactory.generate(LOGIC_DB_DB_TABLE_SHARD);
+        dao = DaoFactory.generate(LOGIC_DB_TABLE_DB_SHARD);
     }
 
     @Before
@@ -32,9 +31,8 @@ public class DbTableShardTest extends BaseTest {
             for (int j = 0; j < TABLE_MOD; j++) {
                 for (int k = 0; k < TABLE_MOD; k++) {
                     String sql = String.format("INSERT INTO `order_%d` (`id`, `name`, `city_id`, `country_id`) VALUES ('%s', '%s', '%s', '%s')", j, k + 1, "apple", i, j);
-                    sqlBuilder = new SqlBuilder(LOGIC_DB_DB_TABLE_SHARD);
-                    sqlBuilder.hints().inDbShard(i).inTableShard(j);
-                    sqlBuilder.append(sql).execute();
+                    ISqlBuilder sqlb = sqlBuilder().append(sql).hints(new Hints().inDbShard(i).inTableShard(j));
+                    tableDbShardDao.run(sqlb);
                 }
             }
         }

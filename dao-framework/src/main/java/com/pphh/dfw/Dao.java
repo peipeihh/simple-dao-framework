@@ -25,6 +25,7 @@ public class Dao implements IDao {
     private IHints hints = new Hints();
     private String logicDbName;
     private EntityParser entityParser;
+    private Transformer transformer = new Transformer();
 
     public Dao(String logicDbName) {
         this.logicDbName = logicDbName;
@@ -39,27 +40,27 @@ public class Dao implements IDao {
         GenericTable table = this.entityParser.parse((IEntity) entity);
 
         if (table != null) {
-            // 主键Id + 主键
+            // 获取主键信息
             ITableField primaryKey = table.getPkField();
-            String keyDefName = primaryKey.getFieldName();
-            Object value = table.getFieldValue(primaryKey);
+            Object value = primaryKey.getFieldValue();
 
-            SqlBuilder sqlBuilder = new SqlBuilder(logicDbName);
+            // 解析分片
+            SqlBuilder sqlBuilder = new SqlBuilder();
             Object dbShard = this.hints.getHintValue(HintEnum.DB_SHARD_VALUE);
             if (dbShard != null) {
-                sqlBuilder.hints().dbShardValue(dbShard);
+                sqlBuilder.getHints().dbShardValue(dbShard);
             }
             Object tableShard = this.hints.getHintValue(HintEnum.TABLE_SHARD_VALUE);
             if (tableShard != null) {
-                sqlBuilder.hints().tableShardValue(tableShard);
+                sqlBuilder.getHints().tableShardValue(tableShard);
             }
             sqlBuilder.select().from(table).where(primaryKey.equal(value));
             setShard(sqlBuilder, table);
-            String sql = sqlBuilder.buildOn(logicDbName);
-            System.out.println(sql);
+
+            sqlBuilder.into((Class<? extends T>) entity.getClass());
 
             try {
-                List<T> results = sqlBuilder.fetchInto((Class<? extends T>) entity.getClass());
+                List<T> results = (List<T>) this.queryForList(sqlBuilder);
                 if (results.size() > 0) {
                     result = results.get(0);
                 }
@@ -127,8 +128,13 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder) {
-        return null;
+    public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder) throws Exception {
+        String sql = sqlBuilder.buildOn(this);
+        System.out.println(sql);
+        String[] sqlInfo = parse(sql);
+
+        Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
+        return transformer.run(sqlInfo[0], sqlInfo[1], pojoClz);
     }
 
     @Override
@@ -137,8 +143,31 @@ public class Dao implements IDao {
     }
 
     @Override
-    public int run(ISqlBuilder sqlBuilder) {
-        return 0;
+    public int run(ISqlBuilder sqlBuilder) throws Exception {
+        String sql = sqlBuilder.buildOn(this);
+        System.out.println(sql);
+        String[] sqlInfo = parse(sql);
+
+        return transformer.run(sqlInfo[0], sqlInfo[1]);
+    }
+
+    private String[] parse(String sql) {
+        String sqlStatement;
+        String dbName;
+        LogicDBConfig logicDBConfig = GlobalDataSourceConfig.getInstance().getLogicDBConfig(this.logicDbName);
+        if (sql.contains("--")) {
+            String[] strArr = sql.split("--");
+            sqlStatement = strArr[0];
+            String dbShard = strArr[1].trim();
+            dbName = logicDBConfig.getPhysicalDbName(dbShard);
+        } else {
+            sqlStatement = sql;
+            dbName = logicDBConfig.getDefaultPhysicalDbName();
+        }
+
+        String[] sqlInfo = {sqlStatement, dbName};
+
+        return sqlInfo;
     }
 
     @Override
@@ -149,6 +178,11 @@ public class Dao implements IDao {
     @Override
     public IHints getHints() {
         return this.hints;
+    }
+
+    @Override
+    public String getLogicName() {
+        return this.logicDbName;
     }
 
     private SqlBuilder setShard(SqlBuilder sqlBuilder, GenericTable table) {
@@ -169,13 +203,13 @@ public class Dao implements IDao {
                 if (logicDBConfig.getDbShardColumn() != null && !logicDBConfig.getDbShardColumn().isEmpty()) {
                     String dbShardColumn = logicDBConfig.getDbShardColumn();
                     Object dbShard = table.getFieldValue(dbShardColumn);
-                    sqlBuilder.hints().dbShardValue(dbShard);
+                    sqlBuilder.getHints().dbShardValue(dbShard);
                 }
 
                 if (logicDBConfig.getTableShardColumn() != null && !logicDBConfig.getTableShardColumn().isEmpty()) {
                     String tableShardColumn = logicDBConfig.getTableShardColumn();
                     Object tableShard = table.getFieldValue(tableShardColumn);
-                    sqlBuilder.hints().tableShardValue(tableShard);
+                    sqlBuilder.getHints().tableShardValue(tableShard);
                 }
 
             }
