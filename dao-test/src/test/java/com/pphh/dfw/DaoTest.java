@@ -1,6 +1,8 @@
 package com.pphh.dfw;
 
+import com.pphh.dfw.sqlb.SqlBuilder;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -15,7 +17,7 @@ public class DaoTest extends BaseTest {
     private Dao dao;
 
     public DaoTest() throws Exception {
-        dao = DaoFactory.generate("tableShard");
+        dao = DaoFactory.generate(LOGIC_DB_TABLE_SHARD);
     }
 
     @Ignore
@@ -23,15 +25,6 @@ public class DaoTest extends BaseTest {
     public void testInsert() throws Exception {
         OrderEntity orderEntity = new OrderEntity();
         dao.insert(orderEntity);
-    }
-
-    @Test
-    public void testQuery() throws Exception {
-        OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setId(1);
-        OrderEntity entity = dao.queryByPk(orderEntity);
-        Assert.assertNotNull(entity);
-        Assert.assertTrue(entity.getId().equals(1));
     }
 
 

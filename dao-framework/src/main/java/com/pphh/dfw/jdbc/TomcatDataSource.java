@@ -10,6 +10,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Please add description here.
@@ -19,6 +20,7 @@ import java.sql.SQLException;
  */
 public class TomcatDataSource implements IDataSource {
 
+    private static AtomicInteger count = new AtomicInteger();
     private DataSource dataSource;
 
     public TomcatDataSource() throws Exception {

@@ -22,4 +22,21 @@ public class SqlBuilderOnDaoTest extends BaseTest {
         Assert.assertNotNull("SELECT `id` , `name` FROM `order_0`", sqlBuilder.buildOn("tableShard"));
     }
 
+    @Test
+    public void testCleanUp() throws Exception {
+        sqlBuilder = new SqlBuilder("noShard");
+        sqlBuilder.append("DELETE FROM `order`");
+        int result = sqlBuilder.execute();
+        Assert.assertTrue(result >= 0);
+    }
+
+    @Test
+    public void testInsertRecord() throws Exception {
+        sqlBuilder = new SqlBuilder("noShard");
+        String insertSql = String.format("INSERT INTO `order` (`name`, `city_id` , `country_id`) VALUES ( '%s' , '%s' , '%s' )", "apple", 1, 10);
+        sqlBuilder.append(insertSql);
+        int result = sqlBuilder.execute();
+        Assert.assertEquals(1, result);
+    }
+
 }

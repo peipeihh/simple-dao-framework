@@ -60,4 +60,24 @@ public class SqlBuilderTest extends BaseTest {
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1' , `name` = 'apple'", sqlBuilder.build());
     }
 
+    @Test
+    public void testPlainSql() {
+        sqlBuilder = new SqlBuilder();
+        sqlBuilder.append("DELETE FROM `order`");
+        Assert.assertEquals("DELETE FROM `order`", sqlBuilder.build());
+
+        sqlBuilder = new SqlBuilder("noShard");
+        sqlBuilder.append("DELETE FROM `order`");
+        Assert.assertEquals("DELETE FROM `order`", sqlBuilder.build());
+
+        sqlBuilder = new SqlBuilder("tableDbShard");
+        sqlBuilder.append("DELETE FROM `order`");
+        Assert.assertEquals("DELETE FROM `order`", sqlBuilder.build());
+
+        sqlBuilder = new SqlBuilder();
+        String insertSql = String.format("INSERT INTO `order` (`name`, `city_id` , `country_id`) VALUES ( '%s' , '%s' , '%s' )", "apple", 1, 10);
+        sqlBuilder.append(insertSql);
+        Assert.assertEquals(insertSql, sqlBuilder.build());
+    }
+
 }

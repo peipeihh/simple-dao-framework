@@ -45,7 +45,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("noShard"));
 
                 // tableShard
-                expectedSql = String.format("SELECT `id` , `name` FROM `order_%s`", j % 2);
+                expectedSql = String.format("SELECT `id` , `name` FROM `order_%s`", j % 3);
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("tableShard"));
 
                 // dbShard
@@ -53,7 +53,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("dbShard"));
 
                 // tableDbShard
-                expectedSql = String.format("SELECT `id` , `name` FROM `order_%s` -- %s", j % 2, i % 2);
+                expectedSql = String.format("SELECT `id` , `name` FROM `order_%s` -- %s", j % 3, i % 2);
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("tableDbShard"));
             }
         }
@@ -74,7 +74,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("noShard"));
 
                 // tableShard
-                expectedSql = String.format("DELETE FROM `order_%s` WHERE `id` = '%s'", j % 2, i * j);
+                expectedSql = String.format("DELETE FROM `order_%s` WHERE `id` = '%s'", j % 3, i * j);
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("tableShard"));
 
                 // dbShard
@@ -82,7 +82,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("dbShard"));
 
                 // tableDbShard
-                expectedSql = String.format("DELETE FROM `order_%s` WHERE `id` = '%s' -- %s", j % 2, i * j, i % 2);
+                expectedSql = String.format("DELETE FROM `order_%s` WHERE `id` = '%s' -- %s", j % 3, i * j, i % 2);
                 Assert.assertEquals(expectedSql, sqlBuilder.buildOn("tableDbShard"));
             }
         }

@@ -61,16 +61,16 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
             throw new Exception("db entries is empty, please set the db entries in the config file at first");
         }
 
-        String[] dbEntries = dbEntriesProperty.split(",");
-        dbConfig.setDbEntries(Stream.of(dbEntries).map(String::trim).collect(Collectors.toList()));
+        List<String> dbEntries = Stream.of(dbEntriesProperty.split(",")).map(String::trim).collect(Collectors.toList());
+        dbConfig.setDbEntries(dbEntries);
         dbConfig.setDefaultDriverContext(propertyList.getProperty(prefix + ".defaultDriverContext"));
         for (String dbEntry : dbEntries) {
-            String inDbShard = propertyList.getProperty(prefix + "." + dbEntry);
+            String inDbShard = propertyList.getProperty(prefix + "." + dbEntry.trim());
             if (inDbShard != null) {
                 dbConfig.setPhysicalDBMap(inDbShard, dbEntry);
             }
         }
-        dbConfig.setPhysicalDBMap("default", dbEntries[0]);
+        dbConfig.setPhysicalDBMap("default", dbEntries.get(0));
 
         String shardStrategy = propertyList.getProperty(prefix + ".shardStrategy");
         if (shardStrategy != null) {

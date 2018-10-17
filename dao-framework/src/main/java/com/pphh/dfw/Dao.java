@@ -1,6 +1,7 @@
 package com.pphh.dfw;
 
 import com.pphh.dfw.core.*;
+import com.pphh.dfw.core.constant.HintEnum;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
@@ -21,6 +22,7 @@ import java.util.function.Function;
  */
 public class Dao implements IDao {
 
+    private IHints hints = new Hints();
     private String logicDbName;
     private EntityParser entityParser;
 
@@ -43,6 +45,14 @@ public class Dao implements IDao {
             Object value = table.getFieldValue(primaryKey);
 
             SqlBuilder sqlBuilder = new SqlBuilder(logicDbName);
+            Object dbShard = this.hints.getHintValue(HintEnum.DB_SHARD_VALUE);
+            if (dbShard != null) {
+                sqlBuilder.hints().dbShardValue(dbShard);
+            }
+            Object tableShard = this.hints.getHintValue(HintEnum.TABLE_SHARD_VALUE);
+            if (tableShard != null) {
+                sqlBuilder.hints().tableShardValue(tableShard);
+            }
             sqlBuilder.select().from(table).where(primaryKey.equal(value));
             setShard(sqlBuilder, table);
             String sql = sqlBuilder.buildOn(logicDbName);
@@ -138,7 +148,7 @@ public class Dao implements IDao {
 
     @Override
     public IHints getHints() {
-        return null;
+        return this.hints;
     }
 
     private SqlBuilder setShard(SqlBuilder sqlBuilder, GenericTable table) {

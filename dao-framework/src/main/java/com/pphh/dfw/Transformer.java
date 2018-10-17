@@ -1,7 +1,6 @@
 package com.pphh.dfw;
 
 import com.pphh.dfw.core.IEntity;
-import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import com.pphh.dfw.core.jdbc.IDataSource;
 import com.pphh.dfw.core.table.ITableField;
@@ -10,7 +9,6 @@ import com.pphh.dfw.core.transform.ShardTask;
 import com.pphh.dfw.core.transform.ShardTaskResult;
 import com.pphh.dfw.jdbc.TomcatDataSource;
 import com.pphh.dfw.table.GenericTable;
-import com.pphh.dfw.table.TableField;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -20,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Please add description here.
@@ -29,13 +29,37 @@ import java.util.List;
  */
 public class Transformer implements ITransformer {
 
+    private static Map<String, Connection> connectionMap = new ConcurrentHashMap<>();
+
+    @Override
+    public int run(String sql, String dbName) throws Exception {
+        PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
+        IDataSource dataSource = new TomcatDataSource(shardPhysicalDBConfig);
+        Connection connection = connectionMap.get(dbName);
+        if (connection == null) {
+            connection = dataSource.getConnection();
+            connectionMap.put(dbName, connection);
+        }
+
+        // execute
+        PreparedStatement statement = connection.prepareStatement(sql);
+        int result = statement.executeUpdate();
+        statement.close();
+
+        return result;
+    }
+
     @Override
     public <T> List<T> run(String sql, String dbName, Class<? extends T> resultClz) throws Exception {
         PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
+        IDataSource dataSource = new TomcatDataSource(shardPhysicalDBConfig);
+        Connection connection = connectionMap.get(dbName);
+        if (connection == null) {
+            connection = dataSource.getConnection();
+            connectionMap.put(dbName, connection);
+        }
 
         // execute
-        IDataSource dataSource = new TomcatDataSource(shardPhysicalDBConfig);
-        Connection connection = dataSource.getConnection();
         PreparedStatement statement = connection.prepareStatement(sql);
         ResultSet resultSet = statement.executeQuery();
 
@@ -45,7 +69,6 @@ public class Transformer implements ITransformer {
         // close resource
         resultSet.close();
         statement.close();
-        connection.close();
 
         return entities;
     }

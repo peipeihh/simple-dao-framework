@@ -12,7 +12,8 @@ import java.util.Properties;
  */
 public class ModShardStrategy implements ShardStrategy {
 
-    private Integer mode = 2;
+    private Integer dbMod = 2;
+    private Integer tableMod = 3;
     private String tableName;
     private String tableSeparator;
 
@@ -26,7 +27,7 @@ public class ModShardStrategy implements ShardStrategy {
     public String locateDbShard(String value, Boolean requireCalc) {
         Long shard = Long.parseLong(value);
         if (requireCalc) {
-            shard = shard % mode;
+            shard = shard % dbMod;
         }
         return shard.toString();
     }
@@ -35,7 +36,7 @@ public class ModShardStrategy implements ShardStrategy {
     public String locateTableShard(String value, Boolean requireCalc) {
         Long shard = Long.parseLong(value);
         if (requireCalc) {
-            shard = shard % mode;
+            shard = shard % tableMod;
         }
         return String.format("%s%s%s", tableName, tableSeparator, shard.toString());
     }

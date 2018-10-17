@@ -12,6 +12,8 @@ import java.util.List;
  */
 public interface ITransformer {
 
+    int run(String sql, String dbName) throws Exception;
+
     <T> List<T> run(String sql, String dbName, Class<? extends T> resultClz) throws Exception;
 
     <T> ShardTaskResult<T> run(ShardTask<T> task, Class<? extends IEntity> resultClz);
