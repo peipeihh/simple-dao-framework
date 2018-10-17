@@ -1,7 +1,9 @@
-package com.pphh.dfw;
+package com.pphh.dfw.config;
 
+import com.pphh.dfw.GlobalDataSourceConfig;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
+import com.pphh.dfw.jdbc.TestConnection;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.junit.Test;

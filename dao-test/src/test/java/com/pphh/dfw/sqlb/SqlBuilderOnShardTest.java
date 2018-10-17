@@ -1,5 +1,6 @@
-package com.pphh.dfw;
+package com.pphh.dfw.sqlb;
 
+import com.pphh.dfw.BaseTest;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import org.junit.Assert;
 import org.junit.Test;

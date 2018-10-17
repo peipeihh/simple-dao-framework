@@ -1,5 +1,6 @@
-package com.pphh.dfw;
+package com.pphh.dfw.jdbc;
 
+import com.pphh.dfw.jdbc.TestConnection;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.junit.Test;

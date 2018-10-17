@@ -1,5 +1,9 @@
-package com.pphh.dfw;
+package com.pphh.dfw.dao;
 
+import com.pphh.dfw.BaseTest;
+import com.pphh.dfw.Dao;
+import com.pphh.dfw.DaoFactory;
+import com.pphh.dfw.OrderEntity;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import org.junit.Assert;
 import org.junit.Before;

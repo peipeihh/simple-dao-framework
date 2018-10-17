@@ -1,4 +1,4 @@
-package com.pphh.dfw;
+package com.pphh.dfw.jdbc;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 
