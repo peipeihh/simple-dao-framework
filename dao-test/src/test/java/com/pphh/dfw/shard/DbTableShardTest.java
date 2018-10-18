@@ -2,10 +2,9 @@ package com.pphh.dfw.shard;
 
 import com.pphh.dfw.*;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+
+import java.util.List;
 
 import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 
@@ -44,7 +43,7 @@ public class DbTableShardTest extends BaseTest {
     }
 
     @Test
-    public void testQuery() {
+    public void testQueryByPk() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 for (int k = 0; k < TABLE_MOD; k++) {
@@ -64,7 +63,7 @@ public class DbTableShardTest extends BaseTest {
 
 
     @Test
-    public void testQueryWithHints() {
+    public void testQueryWithHints() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
             dao.getHints().dbShardValue(i);
             for (int j = 0; j < TABLE_MOD; j++) {
@@ -78,6 +77,52 @@ public class DbTableShardTest extends BaseTest {
                     Assert.assertNotNull(entity);
                     Assert.assertEquals(k + 1, entity.getId().intValue());
                 }
+            }
+        }
+    }
+
+    @Test
+    public void testQueryBySample() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    List<OrderEntity> entities = dao.queryBySample(order);
+                    Assert.assertNotNull(entities);
+                    for (OrderEntity entity : entities) {
+                        Assert.assertEquals(i, entity.getCityID().intValue());
+                        Assert.assertEquals(j, entity.getCountryID().intValue());
+                    }
+                }
+            }
+        }
+    }
+
+    @Ignore
+    @Test
+    public void testCountBySample() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                OrderEntity order = new OrderEntity();
+                order.setCityID(i);
+                order.setCountryID(j);
+                long count = dao.countBySample(order);
+                Assert.assertEquals(TABLE_MOD, count);
+            }
+        }
+    }
+
+    @Test
+    public void testInsert() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                OrderEntity order = new OrderEntity();
+                order.setCityID(i);
+                order.setCountryID(j);
+                int result = dao.insert(order);
+                Assert.assertEquals(1, result);
             }
         }
     }

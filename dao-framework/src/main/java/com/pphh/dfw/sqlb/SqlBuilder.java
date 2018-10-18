@@ -132,8 +132,14 @@ public class SqlBuilder implements ISqlBuilder {
     public ISqlBuilder values(Object... values) {
         List<ISqlSegement> segements = new LinkedList<>();
         for (Object value : values) {
-            String formattedValue = String.format("'%s'", value);
-            segements.add(new SqlSegement(formattedValue));
+
+            if (value instanceof ISqlSegement) {
+                segements.add((ISqlSegement) value);
+            } else {
+                String formattedValue = String.format("'%s'", value);
+                segements.add(new SqlSegement(formattedValue));
+            }
+
         }
         this.append(VALUES, LBRACKET, comma(segements.toArray(new ISqlSegement[0])), RBRACKET);
         return this;

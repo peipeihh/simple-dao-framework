@@ -15,15 +15,15 @@ import java.util.function.Function;
  */
 public interface IDao {
 
-    <T> T queryByPk(T entity);
+    <T> T queryByPk(T entity) throws Exception;
 
-    <T extends IEntity> List<T> queryBySample(T entity);
+    <T extends IEntity> List<T> queryBySample(T entity) throws Exception;
 
     <T extends IEntity> List<T> queryAll(Long limit);
 
-    <T extends IEntity> long countBySample(T entity);
+    <T extends IEntity> long countBySample(T entity) throws Exception;
 
-    <T extends IEntity> int insert(T entity);
+    <T extends IEntity> int insert(T entity) throws Exception;
 
     <T extends IEntity> int[] insert(List<T> entities);
 
@@ -37,7 +37,7 @@ public interface IDao {
 
     <T extends IEntity> int[] update(List<T> entities);
 
-    <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder);
+    <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder) throws Exception;
 
     <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder) throws Exception;
 

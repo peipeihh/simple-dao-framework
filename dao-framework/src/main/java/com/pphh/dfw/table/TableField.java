@@ -1,8 +1,5 @@
 package com.pphh.dfw.table;
 
-
-import com.pphh.dfw.core.constant.FieldTypeEnum;
-
 import java.lang.reflect.Type;
 
 /**
@@ -13,8 +10,8 @@ import java.lang.reflect.Type;
  */
 public class TableField extends AbstractTableField {
 
-    public TableField(String fieldName) {
-        this.fieldName = fieldName;
+    public TableField(String fieldDefinition) {
+        this.fieldDefinition = fieldDefinition;
     }
 
     public TableField(String fieldName, String fieldDefinication, Type fieldType, Object fieldValue) {
@@ -26,6 +23,6 @@ public class TableField extends AbstractTableField {
 
     @Override
     public String buildSql() {
-        return String.format("`%s`", fieldName);
+        return String.format("`%s`", this.fieldDefinition);
     }
 }

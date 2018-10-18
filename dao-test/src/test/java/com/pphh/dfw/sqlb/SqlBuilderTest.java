@@ -2,7 +2,6 @@ package com.pphh.dfw.sqlb;
 
 import com.pphh.dfw.BaseTest;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
-import com.pphh.dfw.core.table.Expression;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

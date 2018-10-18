@@ -7,12 +7,17 @@ import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
+import com.pphh.dfw.core.sqlb.ISqlSegement;
+import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import com.pphh.dfw.table.GenericTable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static com.pphh.dfw.core.sqlb.SqlConstant.*;
 
 /**
  * Please add description here.
@@ -33,48 +38,56 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T> T queryByPk(T entity) {
-        T result = null;
-
+    public <T> T queryByPk(T entity) throws Exception {
         // parse entity, 获取entity definition
         GenericTable table = this.entityParser.parse((IEntity) entity);
-
-        if (table != null) {
-            // 获取主键信息
-            ITableField primaryKey = table.getPkField();
-            Object value = primaryKey.getFieldValue();
-
-            // 解析分片
-            SqlBuilder sqlBuilder = new SqlBuilder();
-            Object dbShard = this.hints.getHintValue(HintEnum.DB_SHARD_VALUE);
-            if (dbShard != null) {
-                sqlBuilder.getHints().dbShardValue(dbShard);
-            }
-            Object tableShard = this.hints.getHintValue(HintEnum.TABLE_SHARD_VALUE);
-            if (tableShard != null) {
-                sqlBuilder.getHints().tableShardValue(tableShard);
-            }
-            sqlBuilder.select().from(table).where(primaryKey.equal(value));
-            setShard(sqlBuilder, table);
-
-            sqlBuilder.into((Class<? extends T>) entity.getClass());
-
-            try {
-                List<T> results = (List<T>) this.queryForList(sqlBuilder);
-                if (results.size() > 0) {
-                    result = results.get(0);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
         }
 
+        // 获取主键信息
+        ITableField primaryKey = table.getPkField();
+        Object value = primaryKey.getFieldValue();
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(this.hints);
+        sqlBuilder.select().from(table).where(primaryKey.equal(value));
+        setShard(sqlBuilder, table);
+        sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+        List<T> results = (List<T>) this.queryForList(sqlBuilder);
+        T result = null;
+        if (results.size() > 0) {
+            result = results.get(0);
+        }
         return result;
     }
 
     @Override
-    public <T extends IEntity> List<T> queryBySample(T entity) {
-        return null;
+    public <T extends IEntity> List<T> queryBySample(T entity) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entity);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        // 获取entity的各个字段定义，生成sql
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(this.hints);
+        setShard(sqlBuilder, table);
+        sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+        List<ISqlSegement> conditions = new ArrayList<>();
+        List<ITableField> fields = table.getFields();
+        for (ITableField field : fields) {
+            if (field.getFieldValue() != null) {
+                ISqlSegement condition = field.equal(field.getFieldValue());
+                conditions.add(condition);
+                conditions.add(AND);
+            }
+        }
+        if (conditions.size() > 0) {
+            conditions.remove(conditions.size() - 1);
+        }
+        sqlBuilder.select().from(table).where(conditions.toArray(new ISqlSegement[conditions.size()]));
+
+        return (List<T>) this.queryForList(sqlBuilder);
     }
 
     @Override
@@ -83,13 +96,63 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> long countBySample(T entity) {
-        return 0;
+    public <T extends IEntity> long countBySample(T entity) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entity);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        // 获取entity的各个字段定义，生成sql
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(this.hints);
+        setShard(sqlBuilder, table);
+        sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+        List<ISqlSegement> conditions = new ArrayList<>();
+        List<ITableField> fields = table.getFields();
+        for (ITableField field : fields) {
+            if (field.getFieldValue() != null) {
+                ISqlSegement condition = field.equal(field.getFieldValue());
+                conditions.add(condition);
+                conditions.add(AND);
+            }
+        }
+        if (conditions.size() > 0) {
+            conditions.remove(conditions.size() - 1);
+        }
+        sqlBuilder.selectCount().from(table).where(conditions.toArray(new ISqlSegement[conditions.size()]));
+
+        // FIXME fetch the count of sql query
+        List<T> results = this.queryForList(sqlBuilder);
+        return results.size();
     }
 
     @Override
-    public <T extends IEntity> int insert(T entity) {
-        return 0;
+    public <T extends IEntity> int insert(T entity) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entity);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        // 获取entity的各个字段定义，生成sql
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(this.hints);
+        setShard(sqlBuilder, table);
+        sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+        List<ITableField> definitions = new ArrayList<>();
+        List<ISqlSegement> values = new ArrayList<>();
+
+        List<ITableField> fields = table.getFields();
+        for (ITableField field : fields) {
+            if (field.getFieldValue() != null) {
+                definitions.add(field);
+                values.add(new Expression(String.format("'%s'", field.getFieldValue())));
+            }
+        }
+
+        sqlBuilder.insertInto(table, definitions.toArray(new ITableField[definitions.size()]))
+                .values(values.toArray(new Expression[values.size()]));
+
+        return this.executeUpdate(sqlBuilder);
     }
 
     @Override
@@ -123,8 +186,15 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder) {
+    public <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder) throws Exception {
         return null;
+    }
+
+    public int executeUpdate(ISqlBuilder sqlBuilder) throws Exception {
+        String sql = sqlBuilder.buildOn(this);
+        System.out.println(sql);
+        String[] sqlInfo = parse(sql);
+        return transformer.run(sqlInfo[0], sqlInfo[1]);
     }
 
     @Override
@@ -185,7 +255,7 @@ public class Dao implements IDao {
         return this.logicDbName;
     }
 
-    private SqlBuilder setShard(SqlBuilder sqlBuilder, GenericTable table) {
+    private ISqlBuilder setShard(ISqlBuilder sqlBuilder, GenericTable table) {
         // 加载逻辑数据库配置
         IDataSourceConfig dsConfig = null;
         try {

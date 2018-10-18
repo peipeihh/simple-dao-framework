@@ -1,6 +1,5 @@
 package com.pphh.dfw.table;
 
-import com.pphh.dfw.core.sqlb.ISqlSegement;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITableField;
 
@@ -45,9 +44,9 @@ public abstract class AbstractTableField implements ITableField {
     public Expression equal(Object value) {
         Expression expression;
         if (value == null) {
-            expression = new Expression(String.format("`%s` IS NULL", fieldName));
+            expression = new Expression(String.format("`%s` IS NULL", fieldDefinition));
         } else {
-            expression = new Expression(String.format("`%s` = '%s'", fieldName, value));
+            expression = new Expression(String.format("`%s` = '%s'", fieldDefinition, value));
         }
         return expression;
     }
@@ -56,36 +55,36 @@ public abstract class AbstractTableField implements ITableField {
     public Expression notEqual(Object value) {
         Expression expression;
         if (value == null) {
-            expression = new Expression(String.format("`%s` IS NOT NULL", fieldName));
+            expression = new Expression(String.format("`%s` IS NOT NULL", fieldDefinition));
         } else {
-            expression = new Expression(String.format("`%s` <> '%s'", fieldName, value));
+            expression = new Expression(String.format("`%s` <> '%s'", fieldDefinition, value));
         }
         return expression;
     }
 
     @Override
     public Expression greaterThan(Object value) {
-        return new Expression(String.format("`%s` > '%s'", fieldName, value));
+        return new Expression(String.format("`%s` > '%s'", fieldDefinition, value));
     }
 
     @Override
     public Expression greaterThanOrEqual(Object value) {
-        return new Expression(String.format("`%s` >= '%s'", fieldName, value));
+        return new Expression(String.format("`%s` >= '%s'", fieldDefinition, value));
     }
 
     @Override
     public Expression lessThan(Object value) {
-        return new Expression(String.format("`%s` < '%s'", fieldName, value));
+        return new Expression(String.format("`%s` < '%s'", fieldDefinition, value));
     }
 
     @Override
     public Expression between(Object firstValue, Object secondValue) {
-        return new Expression(String.format("`%s` BETWEEN '%s' AND '%s'", fieldName, firstValue, secondValue));
+        return new Expression(String.format("`%s` BETWEEN '%s' AND '%s'", fieldDefinition, firstValue, secondValue));
     }
 
     @Override
     public Expression notBetween(Object firstValue, Object secondValue) {
-        return new Expression(String.format("`%s` NOT BETWEEN '%s' AND '%s'", fieldName, firstValue, secondValue));
+        return new Expression(String.format("`%s` NOT BETWEEN '%s' AND '%s'", fieldDefinition, firstValue, secondValue));
     }
 
     @Override
@@ -98,7 +97,7 @@ public abstract class AbstractTableField implements ITableField {
         if (inCondition.endsWith(",")) {
             inCondition = inCondition.substring(0, inCondition.length() - 1);
         }
-        return new Expression(String.format("`%s` IN ( %s )", fieldName, inCondition));
+        return new Expression(String.format("`%s` IN ( %s )", fieldDefinition, inCondition));
     }
 
     @Override
@@ -111,7 +110,7 @@ public abstract class AbstractTableField implements ITableField {
         if (inCondition.endsWith(",")) {
             inCondition = inCondition.substring(0, inCondition.length() - 1);
         }
-        return new Expression(String.format("`%s` NOT IN ( %s )", fieldName, inCondition));
+        return new Expression(String.format("`%s` NOT IN ( %s )", fieldDefinition, inCondition));
     }
 
     @Override
@@ -126,32 +125,32 @@ public abstract class AbstractTableField implements ITableField {
 
     @Override
     public Expression like(Object value) {
-        return new Expression(String.format("`%s` LIKE %s", fieldName, value));
+        return new Expression(String.format("`%s` LIKE %s", fieldDefinition, value));
     }
 
     @Override
     public Expression notLike(Object value) {
-        return new Expression(String.format("`%s` NOT LIKE %s", fieldName, value));
+        return new Expression(String.format("`%s` NOT LIKE %s", fieldDefinition, value));
     }
 
     @Override
     public Expression isNull() {
-        return new Expression(String.format("`%s` IS NULL", fieldName)).nullable();
+        return new Expression(String.format("`%s` IS NULL", fieldDefinition)).nullable();
     }
 
     @Override
     public Expression isNotNull() {
-        return new Expression(String.format("`%s` IS NOT NULL", fieldName)).nullable();
+        return new Expression(String.format("`%s` IS NOT NULL", fieldDefinition)).nullable();
     }
 
     @Override
     public Expression asc() {
-        return new Expression(String.format("`%s` ASC", fieldName));
+        return new Expression(String.format("`%s` ASC", fieldDefinition));
     }
 
     @Override
     public Expression desc() {
-        return new Expression(String.format("`%s` DESC", fieldName));
+        return new Expression(String.format("`%s` DESC", fieldDefinition));
     }
 
     @Override
