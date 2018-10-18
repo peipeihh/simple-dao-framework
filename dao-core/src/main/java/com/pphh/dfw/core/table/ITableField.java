@@ -3,6 +3,7 @@ package com.pphh.dfw.core.table;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Please add description here.
@@ -34,17 +35,21 @@ public interface ITableField extends ISqlSegement {
 
     Expression notBetween(Object firstValue, Object secondValue);
 
-    Expression in(Object value);
+    Expression in(List values);
 
-    Expression notIn(Object value);
+    Expression notIn(List values);
+
+    Expression in(Object...value);
+
+    Expression notIn(Object...value);
 
     Expression like(Object value);
 
     Expression notLike(Object value);
 
-    Expression isNull(Object value);
+    Expression isNull();
 
-    Expression isNotNull(Object value);
+    Expression isNotNull();
 
     Expression asc();
 

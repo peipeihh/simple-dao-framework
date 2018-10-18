@@ -1,9 +1,12 @@
 package com.pphh.dfw.table;
 
+import com.pphh.dfw.core.sqlb.ISqlSegement;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITableField;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Please add description here.
@@ -40,12 +43,24 @@ public abstract class AbstractTableField implements ITableField {
 
     @Override
     public Expression equal(Object value) {
-        return new Expression(String.format("`%s` = '%s'", fieldName, value));
+        Expression expression;
+        if (value == null) {
+            expression = new Expression(String.format("`%s` IS NULL", fieldName));
+        } else {
+            expression = new Expression(String.format("`%s` = '%s'", fieldName, value));
+        }
+        return expression;
     }
 
     @Override
     public Expression notEqual(Object value) {
-        return new Expression(String.format("`%s` <> '%s'", fieldName, value));
+        Expression expression;
+        if (value == null) {
+            expression = new Expression(String.format("`%s` IS NOT NULL", fieldName));
+        } else {
+            expression = new Expression(String.format("`%s` <> '%s'", fieldName, value));
+        }
+        return expression;
     }
 
     @Override
@@ -74,13 +89,39 @@ public abstract class AbstractTableField implements ITableField {
     }
 
     @Override
-    public Expression in(Object value) {
-        return new Expression(String.format("`%s` IN %s", fieldName, value));
+    public Expression in(List values) {
+        StringBuilder inConditionBuilder = new StringBuilder();
+        for (Object value : values) {
+            inConditionBuilder.append(String.format("'%s', ", value));
+        }
+        String inCondition = inConditionBuilder.toString().trim();
+        if (inCondition.endsWith(",")) {
+            inCondition = inCondition.substring(0, inCondition.length() - 1);
+        }
+        return new Expression(String.format("`%s` IN ( %s )", fieldName, inCondition));
     }
 
     @Override
-    public Expression notIn(Object value) {
-        return new Expression(String.format("`%s` NOT IN %s", fieldName, value));
+    public Expression notIn(List values) {
+        StringBuilder inConditionBuilder = new StringBuilder();
+        for (Object value : values) {
+            inConditionBuilder.append(String.format("'%s', ", value));
+        }
+        String inCondition = inConditionBuilder.toString().trim();
+        if (inCondition.endsWith(",")) {
+            inCondition = inCondition.substring(0, inCondition.length() - 1);
+        }
+        return new Expression(String.format("`%s` NOT IN ( %s )", fieldName, inCondition));
+    }
+
+    @Override
+    public Expression in(Object... values) {
+        return in(Arrays.asList(values));
+    }
+
+    @Override
+    public Expression notIn(Object... values) {
+        return notIn(Arrays.asList(values));
     }
 
     @Override
@@ -94,13 +135,13 @@ public abstract class AbstractTableField implements ITableField {
     }
 
     @Override
-    public Expression isNull(Object value) {
-        return new Expression(String.format("`%s` IS NULL", fieldName));
+    public Expression isNull() {
+        return new Expression(String.format("`%s` IS NULL", fieldName)).nullable();
     }
 
     @Override
-    public Expression isNotNull(Object value) {
-        return new Expression(String.format("`%s` IS NOT NULL", fieldName));
+    public Expression isNotNull() {
+        return new Expression(String.format("`%s` IS NOT NULL", fieldName)).nullable();
     }
 
     @Override

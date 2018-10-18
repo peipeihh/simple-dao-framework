@@ -28,7 +28,7 @@ public interface ISqlBuilder {
 
     ISqlBuilder from(ITable... tables);
 
-    ISqlBuilder where(Expression... conditions);
+    ISqlBuilder where(ISqlSegement... conditions);
 
     ISqlBuilder insertInto(ITable table);
 

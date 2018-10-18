@@ -12,11 +12,14 @@ import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
+import com.pphh.dfw.core.sqlb.SqlKeyWord;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.table.GenericTable;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,9 +90,30 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public ISqlBuilder where(Expression... conditions) {
-        this.append(WHERE, comma(conditions));
-        return this;
+    public ISqlBuilder where(ISqlSegement... conditions) {
+        List<ISqlSegement> conditionsParsed = new LinkedList<>();
+        for (int i = 0; i < conditions.length; i++) {
+            ISqlSegement condition = conditions[i];
+            if (condition instanceof Expression) {
+                Boolean isNullable = ((Expression) condition).isNullable();
+                // TODO check condition value , not by string compare
+                String sql = condition.buildSql();
+                if (isNullable && (sql == null || sql.trim().endsWith("'null'") || sql.trim().endsWith("NULL"))) {
+                    // 循环一直到到获取到下一个非AND/OR的expression
+                    while (i + 1 < conditions.length) {
+                        condition = conditions[i + 1];
+                        if (!condition.buildSql().equals(AND.buildSql()) && !condition.buildSql().equals(OR.buildSql())) {
+                            break;
+                        }
+                        i++;
+                    }
+                    continue;
+                }
+            }
+            conditionsParsed.add(condition);
+        }
+
+        return this.append(WHERE, conditionsParsed);
     }
 
     @Override
@@ -166,11 +190,13 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public ISqlBuilder and() {
+        this.append(AND);
         return this;
     }
 
     @Override
     public ISqlBuilder or() {
+        this.append(OR);
         return this;
     }
 
@@ -226,6 +252,9 @@ public class SqlBuilder implements ISqlBuilder {
                 sqlSegements.add((ISqlSegement) clause);
             } else if (clause instanceof List) {
                 sqlSegements.addAll((Collection<? extends ISqlSegement>) clause);
+            } else if (clause instanceof ISqlSegement[]) {
+                ISqlSegement[] segements = (ISqlSegement[]) clause;
+                sqlSegements.addAll(Arrays.asList(segements));
             } else {
                 sqlSegements.add(new SqlSegement(clause.toString()));
             }
@@ -347,12 +376,19 @@ public class SqlBuilder implements ISqlBuilder {
 
         int i = 1;
         for (ISqlSegement segement : segements) {
-            builder.append(segement.buildSql());
-            if (i++ < segements.size()) {
-                builder.append(SPACE.buildSql());
+            // 查看最后一个是否为关键字，若是关键字，则进行优化不加
+            if (i == segements.size()) {
+                ISqlSegement lastSegement = segements.get(i - 1);
+                if (lastSegement instanceof SqlKeyWord) {
+                    break;
+                }
             }
+
+            builder.append(segement.buildSql());
+            builder.append(SPACE.buildSql());
         }
 
-        return builder.toString();
+
+        return builder.toString().trim();
     }
 }
