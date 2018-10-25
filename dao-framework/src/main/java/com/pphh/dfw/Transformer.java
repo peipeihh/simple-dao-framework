@@ -1,21 +1,19 @@
 package com.pphh.dfw;
 
 import com.pphh.dfw.core.IEntity;
+import com.pphh.dfw.core.constant.SqlTaskType;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import com.pphh.dfw.core.jdbc.IDataSource;
 import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.core.transform.ITransformer;
-import com.pphh.dfw.core.transform.ShardTask;
-import com.pphh.dfw.core.transform.ShardTaskResult;
+import com.pphh.dfw.core.transform.Task;
+import com.pphh.dfw.core.transform.TaskResult;
 import com.pphh.dfw.jdbc.TomcatDataSource;
 import com.pphh.dfw.table.GenericTable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +72,42 @@ public class Transformer implements ITransformer {
     }
 
     @Override
-    public <T> ShardTaskResult<T> run(ShardTask<T> task, Class<? extends IEntity> resultClz) {
+    public <T> TaskResult<T> run(Task task) throws Exception {
+        String dbName = task.getDbName();
+        PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
+        IDataSource dataSource = new TomcatDataSource(shardPhysicalDBConfig);
+        Connection connection = connectionMap.get(dbName);
+        if (connection == null) {
+            connection = dataSource.getConnection();
+            connectionMap.put(dbName, connection);
+        }
+
+        TaskResult result = new TaskResult();
+        SqlTaskType taskType = task.getTaskType();
+        if (taskType == SqlTaskType.ExecuteQuery) {
+            PreparedStatement statement = connection.prepareStatement(task.getSql());
+            ResultSet resultSet = statement.executeQuery();
+            List<T> entities = convert(resultSet, task.getPojoClz());
+            resultSet.close();
+            statement.close();
+            result.setEntities(entities);
+        } else if (taskType == SqlTaskType.ExecuteUpdate) {
+            // execute
+            PreparedStatement statement = connection.prepareStatement(task.getSql());
+            int rt = statement.executeUpdate();
+            statement.close();
+            result.setResult(rt);
+        } else if (taskType == SqlTaskType.ExecuteBatchUpdate) {
+            // execute
+            PreparedStatement statement = connection.prepareStatement(task.getSql());
+            int[] rts = statement.executeBatch();
+            statement.close();
+            result.setResults(rts);
+        }
+
         return null;
     }
+
 
     private <T> List<T> convert(ResultSet rs, Class<? extends T> resultClz) throws SQLException {
         List<T> results = new ArrayList<>();

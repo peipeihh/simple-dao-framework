@@ -1,6 +1,5 @@
 package com.pphh.dfw.core.transform;
 
-import com.pphh.dfw.core.IEntity;
 
 import java.util.List;
 
@@ -16,6 +15,6 @@ public interface ITransformer {
 
     <T> List<T> run(String sql, String dbName, Class<? extends T> resultClz) throws Exception;
 
-    <T> ShardTaskResult<T> run(ShardTask<T> task, Class<? extends IEntity> resultClz);
+    <T> TaskResult<T> run(Task task) throws Exception;
 
 }

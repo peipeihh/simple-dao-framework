@@ -8,8 +8,8 @@ package com.pphh.dfw.core.transform;
  */
 public interface ITaskExecutor {
 
-    public ShardTaskResult run(ShardTask task);
+    public TaskResult run(Task task);
 
-    public ShardTaskResult execute(ShardTask task);
+    public TaskResult execute(Task task);
 
 }
