@@ -177,10 +177,10 @@ public class Dao implements IDao {
         // 获取entity的各个字段定义，生成sql
         ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
         sqlBuilder.into((Class<? extends T>) entity.getClass());
-        List<ITableField> definitions = new ArrayList<>();
-        List<ISqlSegement> values = new ArrayList<>();
 
         List<ITableField> fields = table.getFields();
+        List<ITableField> definitions = new ArrayList<>();
+        List<ISqlSegement> values = new ArrayList<>();
         for (ITableField field : fields) {
             if (field.getFieldValue() != null) {
                 definitions.add(field);
@@ -226,7 +226,7 @@ public class Dao implements IDao {
         sqlBuilder.into((Class<? extends T>) entity.getClass());
 
         ITableField field = table.getPkField();
-        Expression condition = new Expression(String.format("%s = %s", field.getFieldDefinition(), field.getFieldValue()));
+        Expression condition = new Expression(String.format("`%s` = '%s'", field.getFieldDefinition(), field.getFieldValue()));
         sqlBuilder.deleteFrom(table).where(condition);
 
         return this.executeUpdate(sqlBuilder);
@@ -234,12 +234,39 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> int deleteBySample(T entity) throws Exception {
-        return 0;
+        GenericTable table = this.entityParser.parse((IEntity) entity);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        return deleteBySample(entity, getShardHints(table));
     }
 
     @Override
     public <T extends IEntity> int deleteBySample(T entity, IHints hints) throws Exception {
-        return 0;
+        GenericTable table = this.entityParser.parse((IEntity) entity);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        // 获取entity的各个字段定义，生成sql
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
+        sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+        List<ITableField> fields = table.getFields();
+        List<ISqlSegement> conditions = new ArrayList<>();
+        for (ITableField field : fields) {
+            if (field.getFieldValue() != null) {
+                conditions.add(new Expression(String.format("`%s` = '%s'", field.getFieldDefinition(), field.getFieldValue())));
+                conditions.add(AND);
+            }
+        }
+        if (conditions.size() > 0) {
+            conditions.remove(conditions.size() - 1);
+        }
+
+        sqlBuilder.deleteFrom(table).where(conditions.toArray(new ISqlSegement[conditions.size()]));
+        return this.executeUpdate(sqlBuilder);
     }
 
     @Override

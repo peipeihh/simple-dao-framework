@@ -144,13 +144,45 @@ public class DbTableShardTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteByHints() throws Exception {
+    public void testDeleteWithHints() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 for (int k = 0; k < TABLE_MOD; k++) {
                     OrderEntity order = new OrderEntity();
                     order.setId(k + 1);
                     int result = dao.delete(order, new Hints().dbShardValue(i).tableShardValue(j));
+                    Assert.assertEquals(1, result);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testDeleteBySample() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setName("apple");
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    int result = dao.deleteBySample(order);
+                    Assert.assertEquals(1, result);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testDeleteBySampleWithHints() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setName("apple");
+                    int result = dao.deleteBySample(order, new Hints().dbShardValue(i).tableShardValue(j));
                     Assert.assertEquals(1, result);
                 }
             }
