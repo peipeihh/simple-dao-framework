@@ -38,7 +38,7 @@ public class TableShardTest extends BaseTest {
     public void testSimpleQuery() throws Exception {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setId(1);
-        OrderEntity entity = dao.queryByPk(orderEntity);
+        OrderEntity entity = dao.query(orderEntity);
         Assert.assertNotNull(entity);
         Assert.assertTrue(entity.getId().equals(1));
         Assert.assertTrue(entity.getCityID().equals(1));

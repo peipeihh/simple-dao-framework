@@ -38,7 +38,7 @@ public interface ISqlBuilder {
 
     ISqlBuilder update(ITable table);
 
-    ISqlBuilder set(Expression... sets);
+    ISqlBuilder set(ISqlSegement... sets);
 
     ISqlBuilder deleteFrom(ITable table);
 

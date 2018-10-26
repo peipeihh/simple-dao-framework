@@ -38,28 +38,32 @@ public class Dao implements IDao {
 
 
     @Override
-    public <T> T queryByPk(T entity) throws Exception {
-        GenericTable table = this.entityParser.parse((IEntity) entity);
+    public <T> T query(T entityWithPk) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
         if (table == null) {
             throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
         }
 
-        return queryByPk(entity, getShardHints(table));
+        return query(entityWithPk, getShardHints(table));
     }
 
     @Override
-    public <T> T queryByPk(T entity, IHints hints) throws Exception {
-        GenericTable table = this.entityParser.parse((IEntity) entity);
+    public <T> T query(T entityWithPk, IHints hints) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
         if (table == null) {
             throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
         }
 
         // 获取主键信息
         ITableField primaryKey = table.getPkField();
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+            throw new RuntimeException("Sorry, primary key is missing in the table definition");
+        }
+
         Object value = primaryKey.getFieldValue();
         ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
         sqlBuilder.select().from(table).where(primaryKey.equal(value));
-        sqlBuilder.into((Class<? extends T>) entity.getClass());
+        sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
         List<T> results = (List<T>) this.queryForList(sqlBuilder);
         T result = null;
@@ -205,28 +209,32 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> int delete(T entity) throws Exception {
-        GenericTable table = this.entityParser.parse((IEntity) entity);
+    public <T extends IEntity> int delete(T entityWithPk) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
         if (table == null) {
             throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
         }
 
-        return delete(entity, getShardHints(table));
+        return delete(entityWithPk, getShardHints(table));
     }
 
     @Override
-    public <T extends IEntity> int delete(T entity, IHints hints) throws Exception {
-        GenericTable table = this.entityParser.parse((IEntity) entity);
+    public <T extends IEntity> int delete(T entityWithPk, IHints hints) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
         if (table == null) {
             throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
         }
 
         // 获取entity的各个字段定义，生成sql
         ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
-        sqlBuilder.into((Class<? extends T>) entity.getClass());
+        sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
-        ITableField field = table.getPkField();
-        Expression condition = new Expression(String.format("`%s` = '%s'", field.getFieldDefinition(), field.getFieldValue()));
+        ITableField primaryKey = table.getPkField();
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+            throw new RuntimeException("Sorry, primary key is missing in the table definition");
+        }
+
+        Expression condition = new Expression(String.format("`%s` = '%s'", primaryKey.getFieldDefinition(), primaryKey.getFieldValue()));
         sqlBuilder.deleteFrom(table).where(condition);
 
         return this.executeUpdate(sqlBuilder);
@@ -257,7 +265,7 @@ public class Dao implements IDao {
         List<ISqlSegement> conditions = new ArrayList<>();
         for (ITableField field : fields) {
             if (field.getFieldValue() != null) {
-                conditions.add(new Expression(String.format("`%s` = '%s'", field.getFieldDefinition(), field.getFieldValue())));
+                conditions.add(field.equal(field.getFieldValue()));
                 conditions.add(AND);
             }
         }
@@ -280,13 +288,41 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> int update(T entity) throws Exception {
-        return 0;
+    public <T extends IEntity> int update(T entityWithPk) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        return update(entityWithPk, getShardHints(table));
     }
 
     @Override
-    public <T extends IEntity> int update(T entity, IHints hints) throws Exception {
-        return 0;
+    public <T extends IEntity> int update(T entityWithPk, IHints hints) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        // 获取entity的各个字段定义，生成sql
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
+        sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
+
+        ITableField primaryKey = table.getPkField();
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+            throw new RuntimeException("Sorry, primary key is missing in the table definition");
+        }
+
+        List<ITableField> fields = table.getFields();
+        List<ISqlSegement> expressions = new ArrayList<>();
+        for (ITableField field : fields) {
+            if (field.getFieldValue() != null) {
+                expressions.add(field.equal(field.getFieldValue()));
+            }
+        }
+
+        sqlBuilder.update(table).set(expressions.toArray(new ISqlSegement[expressions.size()])).where(primaryKey.equal(primaryKey.getFieldValue()));
+        return this.executeUpdate(sqlBuilder);
     }
 
     @Override

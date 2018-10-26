@@ -15,9 +15,9 @@ import java.util.function.Function;
  */
 public interface IDao {
 
-    <T> T queryByPk(T entity) throws Exception;
+    <T> T query(T entityWithPk) throws Exception;
 
-    <T> T queryByPk(T entity, IHints hints) throws Exception;
+    <T> T query(T entityWithPk, IHints hints) throws Exception;
 
     <T extends IEntity> List<T> queryBySample(T entity) throws Exception;
 
@@ -39,9 +39,9 @@ public interface IDao {
 
     <T extends IEntity> int[] insert(List<T> entities, IHints hints) throws Exception;
 
-    <T extends IEntity> int delete(T entity) throws Exception;
+    <T extends IEntity> int delete(T entityWithPk) throws Exception;
 
-    <T extends IEntity> int delete(T entity, IHints hints) throws Exception;
+    <T extends IEntity> int delete(T entityWithPk, IHints hints) throws Exception;
 
     <T extends IEntity> int deleteBySample(T entity) throws Exception;
 
@@ -51,9 +51,9 @@ public interface IDao {
 
     <T extends IEntity> int[] delete(List<T> entities, IHints hints) throws Exception;
 
-    <T extends IEntity> int update(T entity) throws Exception;
+    <T extends IEntity> int update(T entityWithPk) throws Exception;
 
-    <T extends IEntity> int update(T entity, IHints hints) throws Exception;
+    <T extends IEntity> int update(T entityWithPk, IHints hints) throws Exception;
 
     <T extends IEntity> int[] update(List<T> entities) throws Exception;
 

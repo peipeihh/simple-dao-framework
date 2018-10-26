@@ -51,7 +51,7 @@ public class DbTableShardTest extends BaseTest {
                     order.setId(k + 1);
                     order.setCityID(i);
                     order.setCountryID(j);
-                    OrderEntity entity = dao.queryByPk(order);
+                    OrderEntity entity = dao.query(order);
                     Assert.assertNotNull(entity);
                     Assert.assertEquals(k + 1, entity.getId().intValue());
                     Assert.assertEquals(i, entity.getCityID().intValue());
@@ -73,7 +73,7 @@ public class DbTableShardTest extends BaseTest {
                     order.setId(k + 1);
                     order.setCityID(j);
                     order.setCountryID(j * 10);
-                    OrderEntity entity = dao.queryByPk(order);
+                    OrderEntity entity = dao.query(order);
                     Assert.assertNotNull(entity);
                     Assert.assertEquals(k + 1, entity.getId().intValue());
                 }
@@ -184,6 +184,48 @@ public class DbTableShardTest extends BaseTest {
                     order.setName("apple");
                     int result = dao.deleteBySample(order, new Hints().dbShardValue(i).tableShardValue(j));
                     Assert.assertEquals(1, result);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testUpdate() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setName("banana");
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    int result = dao.update(order);
+                    Assert.assertEquals(1, result);
+
+                    OrderEntity pk = new OrderEntity();
+                    pk.setId(k + 1);
+                    OrderEntity entity = dao.query(pk, new Hints().dbShardValue(i).tableShardValue(j));
+                    Assert.assertEquals(entity.getName(), "banana");
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testUpdateWithHints() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setName("banana");
+                    int result = dao.update(order, new Hints().dbShardValue(i).tableShardValue(j));
+                    Assert.assertEquals(1, result);
+
+                    OrderEntity pk = new OrderEntity();
+                    pk.setId(k + 1);
+                    OrderEntity entity = dao.query(pk, new Hints().dbShardValue(i).tableShardValue(j));
+                    Assert.assertEquals(entity.getName(), "banana");
                 }
             }
         }

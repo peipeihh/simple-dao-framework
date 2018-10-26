@@ -152,7 +152,7 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public ISqlBuilder set(Expression... sets) {
+    public ISqlBuilder set(ISqlSegement... sets) {
         this.append(SET, comma(sets));
         return this;
     }
