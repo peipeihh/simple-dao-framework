@@ -65,9 +65,9 @@ public class DbTableShardTest extends BaseTest {
     @Test
     public void testQueryWithHints() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
-            dao.getHints().dbShardValue(i);
+            //dao.getHints().dbShardValue(i);
             for (int j = 0; j < TABLE_MOD; j++) {
-                dao.getHints().tableShardValue(j);
+                //dao.getHints().tableShardValue(j);
                 for (int k = 0; k < TABLE_MOD; k++) {
                     OrderEntity order = new OrderEntity();
                     order.setId(k + 1);

@@ -336,7 +336,7 @@ public class SqlBuilder implements ISqlBuilder {
                 if (logicDBConfig.getDbShardColumn() != null && !logicDBConfig.getDbShardColumn().isEmpty()) {
                     if (dbShardId != null) {
                         dbShard = strategy.locateDbShard(dbShardId.toString(), Boolean.FALSE);
-                    } else {
+                    } else if (dbShardValue != null) {
                         dbShard = strategy.locateDbShard(dbShardValue.toString(), Boolean.TRUE);
                     }
                 }
@@ -344,7 +344,7 @@ public class SqlBuilder implements ISqlBuilder {
                 if (logicDBConfig.getTableShardColumn() != null && !logicDBConfig.getTableShardColumn().isEmpty()) {
                     if (tableShardId != null) {
                         tableShard = strategy.locateTableShard(tableShardId.toString(), Boolean.FALSE);
-                    } else {
+                    } else if (tableShardValue != null) {
                         tableShard = strategy.locateTableShard(tableShardValue.toString(), Boolean.TRUE);
                     }
                 }
