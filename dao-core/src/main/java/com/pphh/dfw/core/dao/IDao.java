@@ -27,7 +27,9 @@ public interface IDao {
 
     <T extends IEntity> int[] insert(List<T> entities);
 
-    <T extends IEntity> int delete(T entity);
+    <T extends IEntity> int delete(T entity) throws Exception;
+
+    <T extends IEntity> int delete(T entity, IHints hints) throws Exception;
 
     <T extends IEntity> int deleteBySample(T entity);
 

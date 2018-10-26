@@ -161,8 +161,40 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> int delete(T entity) {
-        return 0;
+    public <T extends IEntity> int delete(T entity) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entity);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        // 获取entity的各个字段定义，生成sql
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(this.hints);
+        setShard(sqlBuilder, table);
+        sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+        ITableField field = table.getPkField();
+        Expression condition = new Expression(String.format("%s = %s", field.getFieldDefinition(), field.getFieldValue()));
+        sqlBuilder.deleteFrom(table).where(condition);
+
+        return this.executeUpdate(sqlBuilder);
+    }
+
+    @Override
+    public <T extends IEntity> int delete(T entity, IHints hints) throws Exception {
+        GenericTable table = this.entityParser.parse((IEntity) entity);
+        if (table == null) {
+            throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+        }
+
+        // 获取entity的各个字段定义，生成sql
+        ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
+        sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+        ITableField field = table.getPkField();
+        Expression condition = new Expression(String.format("%s = %s", field.getFieldDefinition(), field.getFieldValue()));
+        sqlBuilder.deleteFrom(table).where(condition);
+
+        return this.executeUpdate(sqlBuilder);
     }
 
     @Override
@@ -193,18 +225,17 @@ public class Dao implements IDao {
     public int executeUpdate(ISqlBuilder sqlBuilder) throws Exception {
         String sql = sqlBuilder.buildOn(this);
         System.out.println(sql);
-        String[] sqlInfo = parse(sql);
-        return transformer.run(sqlInfo[0], sqlInfo[1]);
+        DfwSql dfwSql = parse(sql);
+        return transformer.run(dfwSql.getSql(), dfwSql.getDb());
     }
 
     @Override
     public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder) throws Exception {
         String sql = sqlBuilder.buildOn(this);
         System.out.println(sql);
-        String[] sqlInfo = parse(sql);
-
+        DfwSql dfwSql = parse(sql);
         Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
-        return transformer.run(sqlInfo[0], sqlInfo[1], pojoClz);
+        return transformer.run(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
     }
 
     @Override
@@ -216,28 +247,26 @@ public class Dao implements IDao {
     public int run(ISqlBuilder sqlBuilder) throws Exception {
         String sql = sqlBuilder.buildOn(this);
         System.out.println(sql);
-        String[] sqlInfo = parse(sql);
-
-        return transformer.run(sqlInfo[0], sqlInfo[1]);
+        DfwSql dfwSql = parse(sql);
+        return transformer.run(dfwSql.getSql(), dfwSql.getDb());
     }
 
-    private String[] parse(String sql) {
-        String sqlStatement;
+    private DfwSql parse(String sql) {
+        String statement;
         String dbName;
+
         LogicDBConfig logicDBConfig = GlobalDataSourceConfig.getInstance().getLogicDBConfig(this.logicDbName);
         if (sql.contains("--")) {
             String[] strArr = sql.split("--");
-            sqlStatement = strArr[0];
+            statement = strArr[0];
             String dbShard = strArr[1].trim();
             dbName = logicDBConfig.getPhysicalDbName(dbShard);
         } else {
-            sqlStatement = sql;
+            statement = sql;
             dbName = logicDBConfig.getDefaultPhysicalDbName();
         }
 
-        String[] sqlInfo = {sqlStatement, dbName};
-
-        return sqlInfo;
+        return new DfwSql(statement, dbName);
     }
 
     @Override
