@@ -356,16 +356,17 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder) throws Exception {
+        return queryForList(sqlBuilder, sqlBuilder.getHints());
+    }
+
+    @Override
+    public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
+        sqlBuilder.hints(hints);
         String sql = sqlBuilder.buildOn(this);
         System.out.println(sql);
         DfwSql dfwSql = parse(sql);
         Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
         return transformer.run(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
-    }
-
-    @Override
-    public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
-        return null;
     }
 
     @Override

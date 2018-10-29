@@ -321,4 +321,36 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
+    @Test
+    public void testQueryList() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                ISqlBuilder builder = select().from(order)
+                        .where(order.name.equal("apple"))
+                        .hints(new Hints().dbShardValue(i).tableShardValue(j))
+                        .into(OrderEntity.class);
+                List<OrderEntity> results = dao.queryForList(builder);
+                Assert.assertNotNull(results);
+                Assert.assertEquals(TABLE_MOD, results.size());
+                for (OrderEntity entity : results) {
+                    Assert.assertEquals("apple", entity.getName());
+                }
+            }
+        }
+
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                ISqlBuilder builder = select().from(order)
+                        .where(order.name.equal("apple"))
+                        .into(OrderEntity.class);
+                List<OrderEntity> results = dao.queryForList(builder, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertNotNull(results);
+                Assert.assertEquals(TABLE_MOD, results.size());
+                for (OrderEntity entity : results) {
+                    Assert.assertEquals("apple", entity.getName());
+                }
+            }
+        }
+    }
+
 }
