@@ -2,6 +2,7 @@ package com.pphh.dfw;
 
 import com.pphh.dfw.core.*;
 import com.pphh.dfw.core.constant.HintEnum;
+import com.pphh.dfw.core.constant.SqlTaskType;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
@@ -10,6 +11,8 @@ import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITableField;
+import com.pphh.dfw.core.transform.Task;
+import com.pphh.dfw.core.transform.TaskResult;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import com.pphh.dfw.table.GenericTable;
 
@@ -337,12 +340,18 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder) throws Exception {
-        return null;
+        return queryForObject(sqlBuilder, sqlBuilder.getHints());
     }
 
     @Override
     public <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
-        return null;
+        sqlBuilder.hints(hints);
+        String sql = sqlBuilder.buildOn(this);
+        DfwSql dfwSql = parse(sql);
+        Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
+        Task task = new Task(SqlTaskType.ExecuteQuery, dfwSql.getSql(), null, dfwSql.getDb(), pojoClz);
+        TaskResult taskResult = transformer.run(task);
+        return (T) taskResult.getFirstEntity();
     }
 
     @Override

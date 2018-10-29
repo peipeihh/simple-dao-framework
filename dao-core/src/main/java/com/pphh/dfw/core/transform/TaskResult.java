@@ -12,7 +12,7 @@ public class TaskResult<T> {
 
     private int result;
     private int[] results;
-    private T entity;
+    private T firstEntity;
     private List<T> entities;
 
     public int getResult() {
@@ -31,12 +31,12 @@ public class TaskResult<T> {
         this.results = results;
     }
 
-    public T getEntity() {
-        return entity;
+    public T getFirstEntity() {
+        return firstEntity;
     }
 
-    public void setEntity(T entity) {
-        this.entity = entity;
+    public void setFirstEntity(T firstEntity) {
+        this.firstEntity = firstEntity;
     }
 
     public List<T> getEntities() {

@@ -91,6 +91,9 @@ public class Transformer implements ITransformer {
             resultSet.close();
             statement.close();
             result.setEntities(entities);
+            if (entities.size() > 0) {
+                result.setFirstEntity(entities.get(0));
+            }
         } else if (taskType == SqlTaskType.ExecuteUpdate) {
             // execute
             PreparedStatement statement = connection.prepareStatement(task.getSql());
@@ -105,7 +108,7 @@ public class Transformer implements ITransformer {
             result.setResults(rts);
         }
 
-        return null;
+        return result;
     }
 
 

@@ -77,6 +77,11 @@ public class Hints implements IHints {
     }
 
     @Override
+    public void setHintValue(HintEnum hintEnum, Object value) {
+        hints.put(hintEnum, value);
+    }
+
+    @Override
     public Boolean hasHint(HintEnum hintEnum) {
         return hints.containsKey(hintEnum);
     }

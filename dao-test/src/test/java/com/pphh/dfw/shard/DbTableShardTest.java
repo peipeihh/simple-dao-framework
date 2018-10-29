@@ -6,7 +6,9 @@ import org.junit.*;
 
 import java.util.List;
 
+import static com.pphh.dfw.sqlb.SqlStarter.select;
 import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
+import static com.pphh.dfw.core.sqlb.SqlConstant.*;
 
 /**
  * Please add description here.
@@ -226,6 +228,94 @@ public class DbTableShardTest extends BaseTest {
                     pk.setId(k + 1);
                     OrderEntity entity = dao.query(pk, new Hints().dbShardValue(i).tableShardValue(j));
                     Assert.assertEquals(entity.getName(), "banana");
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testQueryObject() throws Exception {
+        // query by (primary key)
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    ISqlBuilder builder = select().from(order)
+                            .where(order.id.equal(k + 1))
+                            .hints(new Hints().dbShardValue(i).tableShardValue(j)).into(OrderEntity.class);
+                    OrderEntity result = dao.queryForObject(builder);
+                    Assert.assertNotNull(result);
+                }
+            }
+        }
+
+        // query by (full values)
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    ISqlBuilder builder = select().from(order)
+                            .where(order.id.equal(k + 1), AND, order.city_id.equal(i), AND, order.country_id.equal(j))
+                            .hints(new Hints().dbShardValue(i).tableShardValue(j)).into(OrderEntity.class);
+                    OrderEntity result = dao.queryForObject(builder);
+                    Assert.assertNotNull(result);
+                }
+            }
+        }
+    }
+
+    @Ignore
+    @Test
+    public void testQueryObjectWithNoHints() throws Exception {
+        // query by (primary key)
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    ISqlBuilder builder = select().from(order)
+                            .where(order.id.equal(k + 1))
+                            .into(OrderEntity.class);
+                    OrderEntity result = dao.queryForObject(builder);
+                    Assert.assertNotNull(result);
+                }
+            }
+        }
+
+        // query by (full values)
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    ISqlBuilder builder = select().from(order)
+                            .where(order.id.equal(k + 1), AND, order.city_id.equal(i), AND, order.country_id.equal(j))
+                            .into(OrderEntity.class);
+                    OrderEntity result = dao.queryForObject(builder);
+                    Assert.assertNotNull(result);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testQueryObjectWithHints() throws Exception {
+        // query with hints (by primary key)
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    ISqlBuilder builder = select().from(order)
+                            .where(order.id.equal(k + 1))
+                            .into(OrderEntity.class);
+                    OrderEntity result = dao.queryForObject(builder, new Hints().dbShardValue(i).tableShardValue(j));
+                    Assert.assertNotNull(result);
+                }
+            }
+        }
+
+        // query with hints (by full values)
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    ISqlBuilder builder = select().from(order)
+                            .where(order.id.equal(k + 1), AND, order.city_id.equal(i), AND, order.country_id.equal(j))
+                            .into(OrderEntity.class);
+                    OrderEntity result = dao.queryForObject(builder, new Hints().dbShardValue(i).tableShardValue(j));
+                    Assert.assertNotNull(result);
                 }
             }
         }

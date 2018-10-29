@@ -31,6 +31,8 @@ public interface IHints {
 
     Object getHintValue(HintEnum hintEnum);
 
+    void setHintValue(HintEnum hintEnum, Object value);
+
     Boolean hasHint(HintEnum hintEnum);
 
 }
