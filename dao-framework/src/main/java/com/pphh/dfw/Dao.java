@@ -62,8 +62,10 @@ public class Dao implements IDao {
 
         // 获取主键信息
         ITableField primaryKey = table.getPkField();
-        if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
             throw new RuntimeException("Sorry, primary key is missing in the table definition");
+        } else if (primaryKey.getFieldDefinition().isEmpty()) {
+            throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
         }
 
         Object value = primaryKey.getFieldValue();
@@ -268,8 +270,10 @@ public class Dao implements IDao {
         sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
         ITableField primaryKey = table.getPkField();
-        if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
             throw new RuntimeException("Sorry, primary key is missing in the table definition");
+        } else if (primaryKey.getFieldDefinition().isEmpty()) {
+            throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
         }
 
         Expression condition = new Expression(String.format("`%s` = '%s'", primaryKey.getFieldDefinition(), primaryKey.getFieldValue()));
@@ -339,8 +343,10 @@ public class Dao implements IDao {
             sqlBuilder.into((Class<? extends T>) entity.getClass());
 
             ITableField primaryKey = table.getPkField();
-            if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+            if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
                 throw new RuntimeException("Sorry, primary key is missing in the table definition");
+            } else if (primaryKey.getFieldDefinition().isEmpty()) {
+                throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
             }
 
             Expression condition = new Expression(String.format("`%s` = '%s'", primaryKey.getFieldDefinition(), primaryKey.getFieldValue()));
@@ -416,8 +422,10 @@ public class Dao implements IDao {
         sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
         ITableField primaryKey = table.getPkField();
-        if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
             throw new RuntimeException("Sorry, primary key is missing in the table definition");
+        } else if (primaryKey.getFieldDefinition().isEmpty()) {
+            throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
         }
 
         List<ITableField> fields = table.getFields();
@@ -427,19 +435,54 @@ public class Dao implements IDao {
                 expressions.add(field.equal(field.getFieldValue()));
             }
         }
-
         sqlBuilder.update(table).set(expressions.toArray(new ISqlSegement[expressions.size()])).where(primaryKey.equal(primaryKey.getFieldValue()));
+
         return this.executeUpdate(sqlBuilder);
     }
 
     @Override
     public <T extends IEntity> int[] update(List<T> entitiesWithPk) throws Exception {
-        return new int[0];
+        return update(entitiesWithPk, null);
     }
 
     @Override
     public <T extends IEntity> int[] update(List<T> entitiesWithPk, IHints hints) throws Exception {
-        return new int[0];
+        List<ISqlBuilder> sqlBuilders = new ArrayList<>();
+        for (T entityWithPk : entitiesWithPk) {
+            GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
+            if (table == null) {
+                throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+            }
+
+            // 获取entity的各个字段定义，生成sql
+            ISqlBuilder sqlBuilder = new SqlBuilder();
+            if (hints == null) {
+                sqlBuilder.hints(getShardHints(table));
+            } else {
+                sqlBuilder.hints(hints);
+            }
+            sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
+
+            ITableField primaryKey = table.getPkField();
+            if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
+                throw new RuntimeException("Sorry, primary key is missing in the table definition");
+            } else if (primaryKey.getFieldDefinition().isEmpty()) {
+                throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
+            }
+
+            List<ITableField> fields = table.getFields();
+            List<ISqlSegement> expressions = new ArrayList<>();
+            for (ITableField field : fields) {
+                if (field.getFieldValue() != null) {
+                    expressions.add(field.equal(field.getFieldValue()));
+                }
+            }
+            sqlBuilder.update(table).set(expressions.toArray(new ISqlSegement[expressions.size()])).where(primaryKey.equal(primaryKey.getFieldValue()));
+
+            sqlBuilders.add(sqlBuilder);
+        }
+
+        return executeBatchUpdate(sqlBuilders);
     }
 
     @Override

@@ -502,4 +502,60 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
+    @Test
+    public void testUpdateList() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setName("banana");
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    orders.add(order);
+                }
+
+                int[] results = dao.update(orders);
+                Assert.assertEquals(3, results.length);
+                for (int result : results) {
+                    Assert.assertEquals(1, result);
+                }
+
+                OrderEntity sample = new OrderEntity();
+                sample.setName("banana");
+                sample.setCityID(i);
+                sample.setCountryID(j);
+                List<OrderEntity> entities = dao.queryBySample(sample);
+                Assert.assertEquals(3, entities.size());
+            }
+        }
+    }
+
+    @Test
+    public void testUpdateListWithHints() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setName("banana");
+                    orders.add(order);
+                }
+
+                int[] results = dao.update(orders, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(3, results.length);
+                for (int result : results) {
+                    Assert.assertEquals(1, result);
+                }
+
+                OrderEntity sample = new OrderEntity();
+                sample.setName("banana");
+                List<OrderEntity> entities = dao.queryBySample(sample, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(3, entities.size());
+            }
+        }
+    }
+
 }
