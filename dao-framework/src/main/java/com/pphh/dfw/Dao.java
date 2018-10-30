@@ -512,7 +512,10 @@ public class Dao implements IDao {
         System.out.println(sql);
         DfwSql dfwSql = parse(sql);
         Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
-        return transformer.run(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
+        Task task = new Task(SqlTaskType.ExecuteQuery, dfwSql.getSql(), null, dfwSql.getDb(), pojoClz);
+        TaskResult taskResult = transformer.run(task);
+        return taskResult.getEntities();
+        //return transformer.run(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
     }
 
     @Override
@@ -527,10 +530,11 @@ public class Dao implements IDao {
 
     @Override
     public int run(ISqlBuilder sqlBuilder) throws Exception {
-        String sql = sqlBuilder.buildOn(this);
-        System.out.println(sql);
-        DfwSql dfwSql = parse(sql);
-        return transformer.run(dfwSql.getSql(), dfwSql.getDb());
+//        String sql = sqlBuilder.buildOn(this);
+//        System.out.println(sql);
+//        DfwSql dfwSql = parse(sql);
+//        return transformer.run(dfwSql.getSql(), dfwSql.getDb());
+        return executeUpdate(sqlBuilder);
     }
 
     @Override
@@ -641,11 +645,14 @@ public class Dao implements IDao {
         return results;
     }
 
-    private int executeUpdate(ISqlBuilder sqlBuilder) throws Exception {
-        String sql = sqlBuilder.buildOn(this);
+    private int executeUpdate(ISqlBuilder singleSqlBuilder) throws Exception {
+        String sql = singleSqlBuilder.buildOn(this);
         System.out.println(sql);
         DfwSql dfwSql = parse(sql);
-        return transformer.run(dfwSql.getSql(), dfwSql.getDb());
+        Task task = new Task(SqlTaskType.ExecuteUpdate, dfwSql.getSql(), null, dfwSql.getDb(), null);
+        TaskResult tResult = transformer.run(task);
+        return tResult.getResult();
+        //return transformer.run(dfwSql.getSql(), dfwSql.getDb());
     }
 
     private DfwSql parse(String sql) {

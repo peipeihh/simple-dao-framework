@@ -30,48 +30,6 @@ public class Transformer implements ITransformer {
     private static Map<String, Connection> connectionMap = new ConcurrentHashMap<>();
 
     @Override
-    public int run(String sql, String dbName) throws Exception {
-        PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
-        IDataSource dataSource = new TomcatDataSource(shardPhysicalDBConfig);
-        Connection connection = connectionMap.get(dbName);
-        if (connection == null) {
-            connection = dataSource.getConnection();
-            connectionMap.put(dbName, connection);
-        }
-
-        // execute
-        PreparedStatement statement = connection.prepareStatement(sql);
-        int result = statement.executeUpdate();
-        statement.close();
-
-        return result;
-    }
-
-    @Override
-    public <T> List<T> run(String sql, String dbName, Class<? extends T> resultClz) throws Exception {
-        PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
-        IDataSource dataSource = new TomcatDataSource(shardPhysicalDBConfig);
-        Connection connection = connectionMap.get(dbName);
-        if (connection == null) {
-            connection = dataSource.getConnection();
-            connectionMap.put(dbName, connection);
-        }
-
-        // execute
-        PreparedStatement statement = connection.prepareStatement(sql);
-        ResultSet resultSet = statement.executeQuery();
-
-        // collect results
-        List<T> entities = convert(resultSet, resultClz);
-
-        // close resource
-        resultSet.close();
-        statement.close();
-
-        return entities;
-    }
-
-    @Override
     public <T> TaskResult<T> run(Task task) throws Exception {
         String dbName = task.getDbName();
         PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
@@ -85,6 +43,7 @@ public class Transformer implements ITransformer {
         TaskResult result = new TaskResult();
         SqlTaskType taskType = task.getTaskType();
         if (taskType == SqlTaskType.ExecuteQuery) {
+            // query for result set
             PreparedStatement statement = connection.prepareStatement(task.getSql());
             ResultSet resultSet = statement.executeQuery();
             List<T> entities = convert(resultSet, task.getPojoClz());
@@ -95,13 +54,13 @@ public class Transformer implements ITransformer {
                 result.setFirstEntity(entities.get(0));
             }
         } else if (taskType == SqlTaskType.ExecuteUpdate) {
-            // execute
+            // a single update operation
             PreparedStatement statement = connection.prepareStatement(task.getSql());
             int rt = statement.executeUpdate();
             statement.close();
             result.setResult(rt);
         } else if (taskType == SqlTaskType.ExecuteBatchUpdate) {
-            // execute
+            // a batch update operation
             Statement statement = connection.createStatement();
             List<String> sqls = task.getBatchSqls();
             for (String sql : sqls) {
