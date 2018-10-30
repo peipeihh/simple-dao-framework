@@ -68,9 +68,7 @@ public class DbTableShardTest extends BaseTest {
     @Test
     public void testQueryWithHints() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
-            //dao.getHints().dbShardValue(i);
             for (int j = 0; j < TABLE_MOD; j++) {
-                //dao.getHints().tableShardValue(j);
                 for (int k = 0; k < TABLE_MOD; k++) {
                     OrderEntity order = new OrderEntity();
                     order.setId(k + 1);
@@ -139,8 +137,12 @@ public class DbTableShardTest extends BaseTest {
                     order.setId(k + 1);
                     order.setCityID(i);
                     order.setCountryID(j);
+
                     int result = dao.delete(order);
+
                     Assert.assertEquals(1, result);
+                    OrderEntity entity = dao.query(order);
+                    Assert.assertNull(entity);
                 }
             }
         }
@@ -322,8 +324,26 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
+    @Ignore
     @Test
     public void testQueryList() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                ISqlBuilder builder = select().from(order)
+                        .where(order.name.equal("apple"), order.city_id.equal(i), order.country_id.equal(j))
+                        .into(OrderEntity.class);
+                List<OrderEntity> results = dao.queryForList(builder);
+                Assert.assertNotNull(results);
+                Assert.assertEquals(TABLE_MOD, results.size());
+                for (OrderEntity entity : results) {
+                    Assert.assertEquals("apple", entity.getName());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testQueryListWithHints() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 ISqlBuilder builder = select().from(order)
@@ -338,10 +358,7 @@ public class DbTableShardTest extends BaseTest {
                 }
             }
         }
-    }
 
-    @Test
-    public void testQueryListWithHints() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 ISqlBuilder builder = select().from(order)
@@ -552,6 +569,7 @@ public class DbTableShardTest extends BaseTest {
 
                 OrderEntity sample = new OrderEntity();
                 sample.setName("banana");
+                sample.setCountryID(j);
                 List<OrderEntity> entities = dao.queryBySample(sample, new Hints().dbShardValue(i).tableShardValue(j));
                 Assert.assertEquals(3, entities.size());
             }
