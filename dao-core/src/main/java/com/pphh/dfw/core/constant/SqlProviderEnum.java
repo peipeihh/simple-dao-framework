@@ -9,6 +9,7 @@ package com.pphh.dfw.core.constant;
 public enum SqlProviderEnum {
 
     SQLSERVER,
-    MYSQL
+    MYSQL,
+    UNKNOWN
 
 }

@@ -1,10 +1,10 @@
 package com.pphh.dfw.core.ds;
 
 import com.pphh.dfw.core.ShardStrategy;
+import com.pphh.dfw.core.constant.SqlProviderEnum;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,6 +47,16 @@ public class LogicDBConfig {
 
     public void setDefaultDriverContext(String defaultDriverContext) {
         this.defaultDriverContext = defaultDriverContext;
+    }
+
+    public SqlProviderEnum getDefaultDriver() {
+        SqlProviderEnum provider = SqlProviderEnum.UNKNOWN;
+        if (defaultDriverContext.equalsIgnoreCase("mysql")) {
+            provider = SqlProviderEnum.MYSQL;
+        } else if (defaultDriverContext.equalsIgnoreCase("sqlserver")) {
+            provider = SqlProviderEnum.SQLSERVER;
+        }
+        return provider;
     }
 
     public String getTableName() {

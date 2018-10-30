@@ -515,7 +515,6 @@ public class Dao implements IDao {
         Task task = new Task(SqlTaskType.ExecuteQuery, dfwSql.getSql(), null, dfwSql.getDb(), pojoClz);
         TaskResult taskResult = transformer.run(task);
         return taskResult.getEntities();
-        //return transformer.run(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
     }
 
     @Override
@@ -530,10 +529,6 @@ public class Dao implements IDao {
 
     @Override
     public int run(ISqlBuilder sqlBuilder) throws Exception {
-//        String sql = sqlBuilder.buildOn(this);
-//        System.out.println(sql);
-//        DfwSql dfwSql = parse(sql);
-//        return transformer.run(dfwSql.getSql(), dfwSql.getDb());
         return executeUpdate(sqlBuilder);
     }
 
@@ -571,6 +566,8 @@ public class Dao implements IDao {
         // 根据逻辑数据库定义，获取分库分表字段
         if (dsConfig != null) {
             LogicDBConfig logicDBConfig = dsConfig.getLogicDBConfig(logicDbName);
+            hints.sqlDialect(logicDBConfig.getDefaultDriver());
+
             ShardStrategy strategy = logicDBConfig.getShardStrategy();
             if (strategy != null) {
 
