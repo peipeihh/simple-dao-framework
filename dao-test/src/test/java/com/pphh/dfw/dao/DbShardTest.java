@@ -1,9 +1,9 @@
-package com.pphh.dfw.shard;
+package com.pphh.dfw.dao;
 
 import com.pphh.dfw.BaseTest;
 
 /**
- * Please add description here.
+ * 实现分库逻辑的DAO
  *
  * @author huangyinhuang
  * @date 10/17/2018

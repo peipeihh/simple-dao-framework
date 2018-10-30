@@ -1,4 +1,4 @@
-package com.pphh.dfw.shard;
+package com.pphh.dfw.dao;
 
 import com.pphh.dfw.*;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
@@ -12,7 +12,7 @@ import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 import static com.pphh.dfw.core.sqlb.SqlConstant.*;
 
 /**
- * Please add description here.
+ * 实现分库分表逻辑的DAO
  *
  * @author huangyinhuang
  * @date 10/17/2018
