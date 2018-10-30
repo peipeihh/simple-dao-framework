@@ -43,21 +43,25 @@ public interface IDao {
 
     <T extends IEntity> int delete(T entityWithPk, IHints hints) throws Exception;
 
-    <T extends IEntity> int deleteBySample(T entity) throws Exception;
+    <T extends IEntity> int deleteBySample(T sample) throws Exception;
 
-    <T extends IEntity> int deleteBySample(T entity, IHints hints) throws Exception;
+    <T extends IEntity> int deleteBySample(T sample, IHints hints) throws Exception;
 
-    <T extends IEntity> int[] delete(List<T> entities) throws Exception;
+    <T extends IEntity> int[] delete(List<T> entitiesWithPk) throws Exception;
 
-    <T extends IEntity> int[] delete(List<T> entities, IHints hints) throws Exception;
+    <T extends IEntity> int[] delete(List<T> entitiesWithPk, IHints hints) throws Exception;
+
+    <T extends IEntity> int[] deleteBySample(List<T> samples) throws Exception;
+
+    <T extends IEntity> int[] deleteBySample(List<T> samples, IHints hints) throws Exception;
 
     <T extends IEntity> int update(T entityWithPk) throws Exception;
 
     <T extends IEntity> int update(T entityWithPk, IHints hints) throws Exception;
 
-    <T extends IEntity> int[] update(List<T> entities) throws Exception;
+    <T extends IEntity> int[] update(List<T> entitiesWithPk) throws Exception;
 
-    <T extends IEntity> int[] update(List<T> entities, IHints hints) throws Exception;
+    <T extends IEntity> int[] update(List<T> entitiesWithPk, IHints hints) throws Exception;
 
     <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder) throws Exception;
 

@@ -353,6 +353,48 @@ public class Dao implements IDao {
     }
 
     @Override
+    public <T extends IEntity> int[] deleteBySample(List<T> samples) throws Exception {
+        return deleteBySample(samples, null);
+    }
+
+    @Override
+    public <T extends IEntity> int[] deleteBySample(List<T> samples, IHints hints) throws Exception {
+        List<ISqlBuilder> sqlBuilders = new ArrayList<>();
+        for (T entity : samples) {
+            GenericTable table = this.entityParser.parse((IEntity) entity);
+            if (table == null) {
+                throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+            }
+
+            // 获取entity的各个字段定义，生成sql
+            ISqlBuilder sqlBuilder = new SqlBuilder();
+            if (hints == null) {
+                sqlBuilder.hints(getShardHints(table));
+            } else {
+                sqlBuilder.hints(hints);
+            }
+            sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+            List<ITableField> fields = table.getFields();
+            List<ISqlSegement> conditions = new ArrayList<>();
+            for (ITableField field : fields) {
+                if (field.getFieldValue() != null) {
+                    conditions.add(field.equal(field.getFieldValue()));
+                    conditions.add(AND);
+                }
+            }
+            if (conditions.size() > 0) {
+                conditions.remove(conditions.size() - 1);
+            }
+            sqlBuilder.deleteFrom(table).where(conditions.toArray(new ISqlSegement[conditions.size()]));
+
+            sqlBuilders.add(sqlBuilder);
+        }
+
+        return executeBatchUpdate(sqlBuilders);
+    }
+
+    @Override
     public <T extends IEntity> int update(T entityWithPk) throws Exception {
         GenericTable table = this.entityParser.parse((IEntity) entityWithPk);
         if (table == null) {
@@ -391,12 +433,12 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> int[] update(List<T> entities) throws Exception {
+    public <T extends IEntity> int[] update(List<T> entitiesWithPk) throws Exception {
         return new int[0];
     }
 
     @Override
-    public <T extends IEntity> int[] update(List<T> entities, IHints hints) throws Exception {
+    public <T extends IEntity> int[] update(List<T> entitiesWithPk, IHints hints) throws Exception {
         return new int[0];
     }
 

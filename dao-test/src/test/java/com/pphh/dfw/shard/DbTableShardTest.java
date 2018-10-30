@@ -462,4 +462,44 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
+    @Test
+    public void testDeleteListBySample() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                OrderEntity sample = new OrderEntity();
+                sample.setName("apple");
+                sample.setCityID(i);
+                sample.setCountryID(j);
+                orders.add(sample);
+
+                int[] results = dao.deleteBySample(orders);
+                Assert.assertEquals(1, results.length);
+                Assert.assertEquals(3, results[0]);
+
+                List<OrderEntity> entities = dao.queryBySample(sample);
+                Assert.assertEquals(0, entities.size());
+            }
+        }
+    }
+
+    @Test
+    public void testDeleteListBySampleWithHints() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                OrderEntity sample = new OrderEntity();
+                sample.setName("apple");
+                orders.add(sample);
+
+                int[] results = dao.deleteBySample(orders, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(1, results.length);
+                Assert.assertEquals(3, results[0]);
+
+                List<OrderEntity> entities = dao.queryBySample(sample, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(0, entities.size());
+            }
+        }
+    }
+
 }
