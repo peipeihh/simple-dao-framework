@@ -3,7 +3,7 @@ package com.pphh.dfw.config;
 import com.pphh.dfw.GlobalDataSourceConfig;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
-import com.pphh.dfw.jdbc.TestConnection;
+import com.pphh.dfw.jdbc.ConnectionTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class ConfigLoaderTest {
         p.setConnectionProperties(physicalDBConfig.getConnectionProperties());
 
         DataSource dataSource = new DataSource(p);
-        TestConnection.testConnection(dataSource, testSql);
+        ConnectionTest.checkConnection(dataSource, testSql);
     }
 
 }

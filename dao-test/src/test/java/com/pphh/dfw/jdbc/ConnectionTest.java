@@ -13,9 +13,9 @@ import java.sql.Statement;
  * @author huangyinhuang
  * @date 10/17/2018
  */
-public class TestConnection {
+public class ConnectionTest {
 
-    public static void testConnection(DataSource dataSource, String testSql) throws SQLException {
+    public static void checkConnection(DataSource dataSource, String testSql) throws SQLException {
         Connection con = null;
         try {
             con = dataSource.getConnection();
