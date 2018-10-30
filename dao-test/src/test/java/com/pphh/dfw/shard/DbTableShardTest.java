@@ -357,7 +357,6 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
-    @Ignore
     @Test
     public void testInsertList() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
@@ -366,6 +365,8 @@ public class DbTableShardTest extends BaseTest {
                 for (int k = 0; k < j + 1; k++) {
                     OrderEntity order = new OrderEntity();
                     order.setName("banana");
+                    order.setCityID(i);
+                    order.setCountryID(j);
                     orders.add(order);
                 }
 
@@ -376,6 +377,8 @@ public class DbTableShardTest extends BaseTest {
 
                 OrderEntity sample = new OrderEntity();
                 sample.setName("banana");
+                sample.setCityID(i);
+                sample.setCountryID(j);
                 List<OrderEntity> entities = dao.queryBySample(sample);
                 Assert.assertEquals(j + 1, entities.size());
 
@@ -391,8 +394,6 @@ public class DbTableShardTest extends BaseTest {
                 for (int k = 0; k < j + 1; k++) {
                     OrderEntity order = new OrderEntity();
                     order.setName("banana");
-                    order.setCityID(i);
-                    order.setCountryID(j);
                     orders.add(order);
                 }
 
@@ -403,11 +404,8 @@ public class DbTableShardTest extends BaseTest {
 
                 OrderEntity sample = new OrderEntity();
                 sample.setName("banana");
-                sample.setCityID(i);
-                sample.setCountryID(j);
-                List<OrderEntity> entities = dao.queryBySample(sample);
+                List<OrderEntity> entities = dao.queryBySample(sample, new Hints().dbShardValue(i).tableShardValue(j));
                 Assert.assertEquals(j + 1, entities.size());
-
             }
         }
     }

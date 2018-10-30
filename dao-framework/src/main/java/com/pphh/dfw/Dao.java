@@ -206,7 +206,7 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> int[] insert(List<T> entities) throws Exception {
-        return insert(entities, new Hints());
+        return insert(entities, null);
     }
 
     @Override
@@ -219,7 +219,12 @@ public class Dao implements IDao {
             }
 
             // 获取entity的各个字段定义，生成sql
-            ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
+            ISqlBuilder sqlBuilder = new SqlBuilder();
+            if (hints == null) {
+                sqlBuilder.hints(getShardHints(table));
+            } else {
+                sqlBuilder.hints(hints);
+            }
             sqlBuilder.into((Class<? extends T>) entity.getClass());
 
             List<ITableField> fields = table.getFields();
