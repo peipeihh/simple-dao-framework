@@ -316,13 +316,40 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> int[] delete(List<T> entities) throws Exception {
-        return new int[0];
+    public <T extends IEntity> int[] delete(List<T> entitiesWithPk) throws Exception {
+        return delete(entitiesWithPk, null);
     }
 
     @Override
-    public <T extends IEntity> int[] delete(List<T> entities, IHints hints) throws Exception {
-        return new int[0];
+    public <T extends IEntity> int[] delete(List<T> entitiesWithPk, IHints hints) throws Exception {
+        List<ISqlBuilder> sqlBuilders = new ArrayList<>();
+        for (T entity : entitiesWithPk) {
+            GenericTable table = this.entityParser.parse((IEntity) entity);
+            if (table == null) {
+                throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+            }
+
+            // 获取entity的各个字段定义，生成sql
+            ISqlBuilder sqlBuilder = new SqlBuilder();
+            if (hints == null) {
+                sqlBuilder.hints(getShardHints(table));
+            } else {
+                sqlBuilder.hints(hints);
+            }
+            sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+            ITableField primaryKey = table.getPkField();
+            if (primaryKey == null || primaryKey.getFieldDefinition() == null || primaryKey.getFieldDefinition().isEmpty()) {
+                throw new RuntimeException("Sorry, primary key is missing in the table definition");
+            }
+
+            Expression condition = new Expression(String.format("`%s` = '%s'", primaryKey.getFieldDefinition(), primaryKey.getFieldValue()));
+            sqlBuilder.deleteFrom(table).where(condition);
+
+            sqlBuilders.add(sqlBuilder);
+        }
+
+        return executeBatchUpdate(sqlBuilders);
     }
 
     @Override

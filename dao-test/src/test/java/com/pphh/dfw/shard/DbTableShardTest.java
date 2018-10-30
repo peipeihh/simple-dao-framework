@@ -410,4 +410,56 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
+    @Test
+    public void testDeleteListByPk() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    orders.add(order);
+                }
+
+                int[] results = dao.delete(orders);
+                for (int result : results) {
+                    Assert.assertEquals(1, result);
+                }
+
+                OrderEntity sample = new OrderEntity();
+                sample.setName("apple");
+                sample.setCityID(i);
+                sample.setCountryID(j);
+                List<OrderEntity> entities = dao.queryBySample(sample);
+                Assert.assertEquals(0, entities.size());
+            }
+        }
+    }
+
+    @Test
+    public void testDeleteListByPkWithHints() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    orders.add(order);
+                }
+
+                int[] results = dao.delete(orders, new Hints().dbShardValue(i).tableShardValue(j));
+                for (int result : results) {
+                    Assert.assertEquals(1, result);
+                }
+
+                OrderEntity sample = new OrderEntity();
+                sample.setName("apple");
+                List<OrderEntity> entities = dao.queryBySample(sample, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(0, entities.size());
+            }
+        }
+    }
+
 }
