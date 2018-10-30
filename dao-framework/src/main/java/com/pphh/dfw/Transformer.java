@@ -102,7 +102,11 @@ public class Transformer implements ITransformer {
             result.setResult(rt);
         } else if (taskType == SqlTaskType.ExecuteBatchUpdate) {
             // execute
-            PreparedStatement statement = connection.prepareStatement(task.getSql());
+            Statement statement = connection.createStatement();
+            List<String> sqls = task.getBatchSqls();
+            for (String sql : sqls) {
+                statement.addBatch(sql);
+            }
             int[] rts = statement.executeBatch();
             statement.close();
             result.setResults(rts);

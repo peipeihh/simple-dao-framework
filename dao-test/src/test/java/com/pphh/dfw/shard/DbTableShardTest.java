@@ -4,6 +4,7 @@ import com.pphh.dfw.*;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import org.junit.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.pphh.dfw.sqlb.SqlStarter.select;
@@ -337,7 +338,10 @@ public class DbTableShardTest extends BaseTest {
                 }
             }
         }
+    }
 
+    @Test
+    public void testQueryListWithHints() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 ISqlBuilder builder = select().from(order)
@@ -349,6 +353,61 @@ public class DbTableShardTest extends BaseTest {
                 for (OrderEntity entity : results) {
                     Assert.assertEquals("apple", entity.getName());
                 }
+            }
+        }
+    }
+
+    @Ignore
+    @Test
+    public void testInsertList() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                for (int k = 0; k < j + 1; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setName("banana");
+                    orders.add(order);
+                }
+
+                int[] results = dao.insert(orders);
+                for (int result : results) {
+                    Assert.assertEquals(1, result);
+                }
+
+                OrderEntity sample = new OrderEntity();
+                sample.setName("banana");
+                List<OrderEntity> entities = dao.queryBySample(sample);
+                Assert.assertEquals(j + 1, entities.size());
+
+            }
+        }
+    }
+
+    @Test
+    public void testInsertListWithHints() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                for (int k = 0; k < j + 1; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setName("banana");
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    orders.add(order);
+                }
+
+                int[] results = dao.insert(orders, new Hints().dbShardValue(i).tableShardValue(j));
+                for (int result : results) {
+                    Assert.assertEquals(1, result);
+                }
+
+                OrderEntity sample = new OrderEntity();
+                sample.setName("banana");
+                sample.setCityID(i);
+                sample.setCountryID(j);
+                List<OrderEntity> entities = dao.queryBySample(sample);
+                Assert.assertEquals(j + 1, entities.size());
+
             }
         }
     }

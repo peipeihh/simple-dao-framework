@@ -15,9 +15,12 @@ import com.pphh.dfw.core.transform.Task;
 import com.pphh.dfw.core.transform.TaskResult;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import com.pphh.dfw.table.GenericTable;
+import com.pphh.dfw.utils.ConvertUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static com.pphh.dfw.core.sqlb.SqlConstant.*;
@@ -115,8 +118,8 @@ public class Dao implements IDao {
     }
 
     @Override
-    public <T extends IEntity> List<T> queryAll(Long limit) {
-        return null;
+    public <T extends IEntity> List<T> queryAll(Long limit) throws Exception {
+        return queryAll(limit, new Hints());
     }
 
     @Override
@@ -203,12 +206,39 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> int[] insert(List<T> entities) throws Exception {
-        return new int[0];
+        return insert(entities, new Hints());
     }
 
     @Override
     public <T extends IEntity> int[] insert(List<T> entities, IHints hints) throws Exception {
-        return new int[0];
+        List<ISqlBuilder> sqlBuilders = new ArrayList<>();
+        for (T entity : entities) {
+            GenericTable table = this.entityParser.parse((IEntity) entity);
+            if (table == null) {
+                throw new RuntimeException("Sorry, failed to parse table definition by entity object. Please input correct entity object.");
+            }
+
+            // 获取entity的各个字段定义，生成sql
+            ISqlBuilder sqlBuilder = new SqlBuilder().hints(hints);
+            sqlBuilder.into((Class<? extends T>) entity.getClass());
+
+            List<ITableField> fields = table.getFields();
+            List<ITableField> definitions = new ArrayList<>();
+            List<ISqlSegement> values = new ArrayList<>();
+            for (ITableField field : fields) {
+                if (field.getFieldValue() != null) {
+                    definitions.add(field);
+                    values.add(new Expression(String.format("'%s'", field.getFieldValue())));
+                }
+            }
+
+            sqlBuilder.insertInto(table, definitions.toArray(new ITableField[definitions.size()]))
+                    .values(values.toArray(new Expression[values.size()]));
+
+            sqlBuilders.add(sqlBuilder);
+        }
+
+        return executeBatchUpdate(sqlBuilders);
     }
 
     @Override
@@ -440,6 +470,59 @@ public class Dao implements IDao {
         }
 
         return hints;
+    }
+
+    private int[] executeBatchUpdate(List<ISqlBuilder> sqlBuilders) throws Exception {
+        int[] results = new int[sqlBuilders.size()];
+
+        // 按dbName对sqls进行分类，以便下一步归类执行
+        Integer index = 0;
+        Map<String, Map<Integer, String>> sqlsMap = new HashMap<>();
+        for (ISqlBuilder sqlBuilder : sqlBuilders) {
+            String sql = sqlBuilder.buildOn(this);
+            DfwSql dfwSql = parse(sql);
+
+            String dbName = dfwSql.getDb();
+            if (!sqlsMap.containsKey(dbName)) {
+                sqlsMap.put(dbName, new HashMap<>());
+            }
+
+            Map<Integer, String> sqls = sqlsMap.get(dbName);
+            sqls.put(index++, dfwSql.getSql());
+        }
+
+        // 按dbName对sqls进行归类执行，相同db合并在一起执行
+        for (Map.Entry<String, Map<Integer, String>> dbShardEntry : sqlsMap.entrySet()) {
+            String dbName = dbShardEntry.getKey();
+            Map<Integer, String> sqls = dbShardEntry.getValue();
+
+            List<Integer> keys = new ArrayList<>();
+            List<String> values = new ArrayList<>();
+
+            for (Map.Entry<Integer, String> sqlEntry : sqls.entrySet()) {
+                keys.add(sqlEntry.getKey());
+                values.add(sqlEntry.getValue());
+            }
+
+            Task task = new Task(SqlTaskType.ExecuteBatchUpdate, null, values, dbName, null);
+            TaskResult taskResult = transformer.run(task);
+            int[] dbShardResults = taskResult.getResults();
+
+            // sqls语句执行的结果数目必须和sqls数目保持一致，以便下一步按序收集
+            if (dbShardResults.length != values.size()) {
+                throw new Exception(String.format("the length of batch update results is incorrect. %s != %s",
+                        dbShardResults.length,
+                        values.size()));
+            }
+
+            for (int i = 0; i < values.size(); i++) {
+                Integer indexR = keys.get(i);
+                results[indexR] = dbShardResults[i];
+            }
+
+        }
+
+        return results;
     }
 
     private int executeUpdate(ISqlBuilder sqlBuilder) throws Exception {

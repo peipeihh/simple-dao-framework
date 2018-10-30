@@ -23,7 +23,7 @@ public interface IDao {
 
     <T extends IEntity> List<T> queryBySample(T entity, IHints hints) throws Exception;
 
-    <T extends IEntity> List<T> queryAll(Long limit);
+    <T extends IEntity> List<T> queryAll(Long limit) throws Exception;
 
     <T extends IEntity> List<T> queryAll(Long limit, IHints hints) throws Exception;
 
