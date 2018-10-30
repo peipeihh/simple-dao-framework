@@ -257,7 +257,7 @@ public class DbTableShardTest extends BaseTest {
                 for (int k = 0; k < TABLE_MOD; k++) {
                     ISqlBuilder builder = select().from(order)
                             .where(order.id.equal(k + 1), AND, order.city_id.equal(i), AND, order.country_id.equal(j))
-                            .hints(new Hints().dbShardValue(i).tableShardValue(j)).into(OrderEntity.class);
+                            .hints(new Hints().inDbShard(i).inTableShard(j)).into(OrderEntity.class);
                     OrderEntity result = dao.queryForObject(builder);
                     Assert.assertNotNull(result);
                 }

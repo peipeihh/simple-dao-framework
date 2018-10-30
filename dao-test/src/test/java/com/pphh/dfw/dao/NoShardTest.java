@@ -32,7 +32,7 @@ public class NoShardTest extends BaseTest {
         for (int k = 0; k < TABLE_MOD; k++) {
             String sql = String.format("INSERT INTO `order` (`id`, `name`, `city_id`, `country_id`) VALUES ('%s', '%s', '%s', '%s')", k + 1, "apple", k * 10 + 1, k * 100 + 1);
             ISqlBuilder sqlb = sqlBuilder().append(sql);
-            tableDbShardDao.run(sqlb);
+            noShardDao.run(sqlb);
         }
     }
 

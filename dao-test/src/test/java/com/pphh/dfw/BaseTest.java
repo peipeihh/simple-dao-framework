@@ -56,7 +56,7 @@ public abstract class BaseTest {
                 execute(tableDbShardDao, statements[j], i, j);
             }
             statements[TABLE_MOD] = String.format("DELETE FROM `%s`", TABLE_NAME);
-            execute(noShardDao, statements[TABLE_MOD], 0, 0);
+            execute(dbShardDao, statements[TABLE_MOD], i, 0);
         }
     }
 

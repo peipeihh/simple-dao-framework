@@ -61,9 +61,9 @@ public class Dao implements IDao {
 
         // 获取主键信息
         ITableField primaryKey = table.getPkField();
-        if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null && primaryKey.getFieldDefinition().isEmpty()) {
             throw new RuntimeException("Sorry, primary key is missing in the table definition");
-        } else if (primaryKey.getFieldDefinition().isEmpty()) {
+        } else if (primaryKey.getFieldValue() == null) {
             throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
         }
 
@@ -269,9 +269,9 @@ public class Dao implements IDao {
         sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
         ITableField primaryKey = table.getPkField();
-        if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null && primaryKey.getFieldDefinition().isEmpty()) {
             throw new RuntimeException("Sorry, primary key is missing in the table definition");
-        } else if (primaryKey.getFieldDefinition().isEmpty()) {
+        } else if (primaryKey.getFieldValue() == null) {
             throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
         }
 
@@ -342,9 +342,9 @@ public class Dao implements IDao {
             sqlBuilder.into((Class<? extends T>) entity.getClass());
 
             ITableField primaryKey = table.getPkField();
-            if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
+            if (primaryKey == null || primaryKey.getFieldDefinition() == null && primaryKey.getFieldDefinition().isEmpty()) {
                 throw new RuntimeException("Sorry, primary key is missing in the table definition");
-            } else if (primaryKey.getFieldDefinition().isEmpty()) {
+            } else if (primaryKey.getFieldValue() == null) {
                 throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
             }
 
@@ -421,9 +421,9 @@ public class Dao implements IDao {
         sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
         ITableField primaryKey = table.getPkField();
-        if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
+        if (primaryKey == null || primaryKey.getFieldDefinition() == null && primaryKey.getFieldDefinition().isEmpty()) {
             throw new RuntimeException("Sorry, primary key is missing in the table definition");
-        } else if (primaryKey.getFieldDefinition().isEmpty()) {
+        } else if (primaryKey.getFieldValue() == null) {
             throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
         }
 
@@ -463,9 +463,9 @@ public class Dao implements IDao {
             sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
             ITableField primaryKey = table.getPkField();
-            if (primaryKey == null || primaryKey.getFieldDefinition() == null) {
+            if (primaryKey == null || primaryKey.getFieldDefinition() == null && primaryKey.getFieldDefinition().isEmpty()) {
                 throw new RuntimeException("Sorry, primary key is missing in the table definition");
-            } else if (primaryKey.getFieldDefinition().isEmpty()) {
+            } else if (primaryKey.getFieldValue() == null) {
                 throw new RuntimeException("Sorry, primary key has empty value in the entity. Please input a entity with primary key specified.");
             }
 
