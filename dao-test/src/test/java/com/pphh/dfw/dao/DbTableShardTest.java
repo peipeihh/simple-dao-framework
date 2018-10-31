@@ -101,6 +101,41 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
+    @Test
+    public void testQueryBySampleWithHints() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    List<OrderEntity> entities = dao.queryBySample(order, new Hints().inDbShard(i).inTableShard(j));
+                    Assert.assertNotNull(entities);
+                    for (OrderEntity entity : entities) {
+                        Assert.assertEquals(i, entity.getCityID().intValue());
+                        Assert.assertEquals(j, entity.getCountryID().intValue());
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                for (int k = 0; k < TABLE_MOD; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setCityID(i);
+                    order.setCountryID(j);
+                    List<OrderEntity> entities = dao.queryBySample(order, new Hints().dbShardValue(i).tableShardValue(j));
+                    Assert.assertNotNull(entities);
+                    for (OrderEntity entity : entities) {
+                        Assert.assertEquals(i, entity.getCityID().intValue());
+                        Assert.assertEquals(j, entity.getCountryID().intValue());
+                    }
+                }
+            }
+        }
+    }
+
     @Ignore
     @Test
     public void testCountBySample() throws Exception {
@@ -496,6 +531,11 @@ public class DbTableShardTest extends BaseTest {
 
                 List<OrderEntity> entities = dao.queryBySample(sample);
                 Assert.assertEquals(0, entities.size());
+
+                // 删除不存在的数据记录，返回结果为0
+                results = dao.deleteBySample(orders);
+                Assert.assertEquals(1, results.length);
+                Assert.assertEquals(0, results[0]);
             }
         }
     }
@@ -515,6 +555,11 @@ public class DbTableShardTest extends BaseTest {
 
                 List<OrderEntity> entities = dao.queryBySample(sample, new Hints().dbShardValue(i).tableShardValue(j));
                 Assert.assertEquals(0, entities.size());
+
+                // 删除不存在的数据记录，返回结果为0
+                results = dao.deleteBySample(orders, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(1, results.length);
+                Assert.assertEquals(0, results[0]);
             }
         }
     }
@@ -572,6 +617,28 @@ public class DbTableShardTest extends BaseTest {
                 sample.setCountryID(j);
                 List<OrderEntity> entities = dao.queryBySample(sample, new Hints().dbShardValue(i).tableShardValue(j));
                 Assert.assertEquals(3, entities.size());
+            }
+        }
+    }
+
+    @Test
+    public void testUpdateListWithCrossShard() throws Exception {
+        for (int i = 0; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                List<OrderEntity> orders = new ArrayList<>();
+                for (int k = 1000; k < TABLE_MOD + 1000; k++) {
+                    OrderEntity order = new OrderEntity();
+                    order.setId(k + 1);
+                    order.setName("banana");
+                    orders.add(order);
+                }
+
+                // 当前表中无k+1的数据字段，因而更新结果为0
+                int[] results = dao.update(orders, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(3, results.length);
+                for (int result : results) {
+                    Assert.assertEquals(0, result);
+                }
             }
         }
     }

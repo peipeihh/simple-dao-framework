@@ -96,6 +96,33 @@ public class DbShardTest extends BaseTest {
         }
     }
 
+    @Test
+    public void testQueryBySampleWithHints() throws Exception {
+        for (int i = 1; i < DB_MOD * 3 + 1; i++) {
+            OrderEntity order = new OrderEntity();
+            order.setCityID(i);
+            order.setCountryID(i * 10 + 1);
+            List<OrderEntity> entities = dao.queryBySample(order, new Hints().inDbShard(i % DB_MOD));
+            Assert.assertNotNull(entities);
+            Assert.assertEquals(1, entities.size());
+            Assert.assertEquals(i, entities.get(0).getId().intValue());
+            Assert.assertEquals(i, entities.get(0).getCityID().intValue());
+            Assert.assertEquals(i * 10 + 1, entities.get(0).getCountryID().intValue());
+        }
+
+        for (int i = 1; i < DB_MOD * 3 + 1; i++) {
+            OrderEntity order = new OrderEntity();
+            order.setCityID(i);
+            order.setCountryID(i * 10 + 1);
+            List<OrderEntity> entities = dao.queryBySample(order, new Hints().dbShardValue(i));
+            Assert.assertNotNull(entities);
+            Assert.assertEquals(1, entities.size());
+            Assert.assertEquals(i, entities.get(0).getId().intValue());
+            Assert.assertEquals(i, entities.get(0).getCityID().intValue());
+            Assert.assertEquals(i * 10 + 1, entities.get(0).getCountryID().intValue());
+        }
+    }
+
     @Ignore
     @Test
     public void testCountBySample() throws Exception {
@@ -147,6 +174,18 @@ public class DbShardTest extends BaseTest {
             OrderEntity order = new OrderEntity();
             order.setId(i);
             int result = dao.delete(order, new Hints().dbShardValue(i));
+            Assert.assertEquals(1, result);
+            OrderEntity entity = dao.query(order);
+            Assert.assertNull(entity);
+        }
+    }
+
+    @Test
+    public void testDeleteWithHints2() throws Exception {
+        for (int i = 1; i < DB_MOD * 3 + 1; i++) {
+            OrderEntity order = new OrderEntity();
+            order.setId(i);
+            int result = dao.delete(order, new Hints().inDbShard(i % DB_MOD));
             Assert.assertEquals(1, result);
             OrderEntity entity = dao.query(order);
             Assert.assertNull(entity);
@@ -499,6 +538,13 @@ public class DbShardTest extends BaseTest {
             List<OrderEntity> entities = dao.queryBySample(sample, new Hints().inDbShard(i));
             Assert.assertEquals(0, entities.size());
         }
+
+        // 删除不存在的数据记录，返回结果为0
+        results = dao.deleteBySample(orders);
+        Assert.assertEquals(DB_MOD * 3, results.length);
+        for (int result : results) {
+            Assert.assertEquals(0, result);
+        }
     }
 
     @Test
@@ -533,6 +579,19 @@ public class DbShardTest extends BaseTest {
         for (int i = 0; i < DB_MOD; i++) {
             List<OrderEntity> entities = dao.queryBySample(sample, new Hints().inDbShard(i));
             Assert.assertEquals(0, entities.size());
+        }
+
+        // 删除不存在的数据记录，返回结果为0
+        results = dao.deleteBySample(orders_db0, new Hints().inDbShard(0));
+        Assert.assertEquals(orders_db0.size(), results.length);
+        for (int result : results) {
+            Assert.assertEquals(0, result);
+        }
+
+        results = dao.deleteBySample(orders_db1, new Hints().dbShardValue(1));
+        Assert.assertEquals(orders_db1.size(), results.length);
+        for (int result : results) {
+            Assert.assertEquals(0, result);
         }
     }
 
@@ -622,12 +681,14 @@ public class DbShardTest extends BaseTest {
             }
         }
 
+        // 当前表中无orders_db0的数据字段，因而更新结果为0
         int[] results = dao.update(orders_db0, new Hints().inDbShard(1));
         Assert.assertEquals(orders_db0.size(), results.length);
         for (int result : results) {
             Assert.assertEquals(0, result);
         }
 
+        // 当前表中无orders_db1的数据字段，因而更新结果为0
         results = dao.update(orders_db1, new Hints().dbShardValue(0));
         Assert.assertEquals(orders_db1.size(), results.length);
         for (int result : results) {

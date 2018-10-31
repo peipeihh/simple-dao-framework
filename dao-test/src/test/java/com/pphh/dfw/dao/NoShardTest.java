@@ -367,6 +367,11 @@ public class NoShardTest extends BaseTest {
         Assert.assertEquals(3, results[0]);
         List<OrderEntity> entities = dao.queryBySample(sample);
         Assert.assertEquals(0, entities.size());
+
+        // 删除不存在的数据记录
+        results = dao.deleteBySample(orders);
+        Assert.assertEquals(1, results.length);
+        Assert.assertEquals(0, results[0]);
     }
 
     @Test
@@ -382,6 +387,11 @@ public class NoShardTest extends BaseTest {
         Assert.assertEquals(3, results[0]);
         List<OrderEntity> entities = dao.queryBySample(sample);
         Assert.assertEquals(0, entities.size());
+
+        // 删除不存在的数据记录，返回结果为0
+        results = dao.deleteBySample(orders, new Hints());
+        Assert.assertEquals(1, results.length);
+        Assert.assertEquals(0, results[0]);
     }
 
     @Test
@@ -442,6 +452,30 @@ public class NoShardTest extends BaseTest {
             Assert.assertNotNull(entity.getCityID());
             Assert.assertEquals(100, entity.getCountryID().intValue());
         }
+    }
+
+    @Test
+    public void testUpdateListNotExists() throws Exception {
+        List<OrderEntity> orders = new ArrayList<>();
+        for (int k = 100; k < TABLE_MOD + 100; k++) {
+            OrderEntity order = new OrderEntity();
+            order.setId(k + 1);
+            order.setName("banana");
+            orders.add(order);
+        }
+
+        // 更新不存在的数据字段，返回结果为0
+        int[] results = dao.update(orders, new Hints());
+
+        Assert.assertEquals(3, results.length);
+        for (int result : results) {
+            Assert.assertEquals(0, result);
+        }
+
+        OrderEntity sample = new OrderEntity();
+        sample.setName("banana");
+        List<OrderEntity> entities = dao.queryBySample(sample);
+        Assert.assertEquals(0, entities.size());
     }
 
 }
