@@ -25,7 +25,7 @@ public class TableShardTest extends BaseTest {
     private Dao dao;
 
     public TableShardTest() throws Exception {
-        dao = DaoFactory.generate(LOGIC_DB_TABLE_SHARD);
+        dao = DaoFactory.create(LOGIC_DB_TABLE_SHARD);
     }
 
     @Before

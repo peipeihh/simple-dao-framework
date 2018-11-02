@@ -14,7 +14,7 @@ public class DaoFactory {
     private static Boolean isConfigLoaded = false;
     private static IDataSourceConfig instance = GlobalDataSourceConfig.getInstance();
 
-    public static Dao generate(String logicDb) throws Exception {
+    public static Dao create(String logicDb) throws Exception {
         if (!isConfigLoaded) {
             instance.load();
             isConfigLoaded = Boolean.TRUE;

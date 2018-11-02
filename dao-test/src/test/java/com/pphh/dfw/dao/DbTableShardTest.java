@@ -22,7 +22,7 @@ public class DbTableShardTest extends BaseTest {
     private Dao dao;
 
     public DbTableShardTest() throws Exception {
-        dao = DaoFactory.generate(LOGIC_DB_TABLE_DB_SHARD);
+        dao = DaoFactory.create(LOGIC_DB_TABLE_DB_SHARD);
     }
 
     @Before

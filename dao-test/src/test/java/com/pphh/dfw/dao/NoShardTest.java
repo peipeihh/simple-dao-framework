@@ -22,7 +22,7 @@ public class NoShardTest extends BaseTest {
     private Dao dao;
 
     public NoShardTest() throws Exception {
-        dao = DaoFactory.generate(LOGIC_DB_NO_SHARD);
+        dao = DaoFactory.create(LOGIC_DB_NO_SHARD);
     }
 
     @Before

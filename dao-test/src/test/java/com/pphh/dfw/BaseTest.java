@@ -31,10 +31,10 @@ public abstract class BaseTest {
 
     public BaseTest() {
         try {
-            noShardDao = DaoFactory.generate(LOGIC_DB_NO_SHARD);
-            dbShardDao = DaoFactory.generate(LOGIC_DB_DB_SHARD);
-            tableShardDao = DaoFactory.generate(LOGIC_DB_TABLE_SHARD);
-            tableDbShardDao = DaoFactory.generate(LOGIC_DB_TABLE_DB_SHARD);
+            noShardDao = DaoFactory.create(LOGIC_DB_NO_SHARD);
+            dbShardDao = DaoFactory.create(LOGIC_DB_DB_SHARD);
+            tableShardDao = DaoFactory.create(LOGIC_DB_TABLE_SHARD);
+            tableDbShardDao = DaoFactory.create(LOGIC_DB_TABLE_DB_SHARD);
         } catch (Exception ignored) {
         }
     }
