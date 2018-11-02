@@ -203,19 +203,19 @@ Dao是一个数据访问对象，其提供对Entity对象的各种增删改查�
    ```
 
 3. 数据库的插入操作
-```
-ISqlBuilder sql = insertInto(order, order.id, order.name).values("1", "apple");
-```
+   ```
+   ISqlBuilder sql = insertInto(order, order.id, order.name).values("1", "apple");
+   ```
 
 4. 数据库的更新操作
-```
-ISqlBuilder sql = update(order).set(order.id.equal(2), order.name.equal("banana"));
-```
+   ```
+   ISqlBuilder sql = update(order).set(order.id.equal(2), order.name.equal("banana"));
+   ```
 
 5. 数据库的删除操作
-```
-ISqlBuilder sql = deleteFrom(order).where(order.id.equal(i * j));
-```
+   ```
+   ISqlBuilder sql = deleteFrom(order).where(order.id.equal(i * j));
+   ```
 
 ### 5.3 分库分表
 
@@ -289,13 +289,15 @@ dao.update(order, new Hints().dbShardValue(i).tableShardValue(j));
 
 | 特性支持 | simple dao framework | MyBatis | Hibernate | Ctrip Dal | MyCat | Sharding-JDBC |  jOOQ |  
 | :--: | :--: | :--: | :--: | :--: | :--: | :--: |:--: |
+
 | POJO JPA Entity | YES | YES | YES | YES | - | - | YES |
 | POJO Entity<br/>自动生成 | No | No | No | Yes | - | - | Yes |
 | DAO实现 | 工厂实例（注1） | 继承 | 继承 | 继承 + 工厂实例 | - | - | 继承 |
 | SqlBuilder | Yes | No（注2）| No（注3）| Yes | - | - | Yes（注4） |
 | Sql语句动态生成 | Yes | -  | - | No | - | - | Yes |
 | 逻辑表和分库分表 （注5） | Yes | No | No | Yes | Yes | Yes | No |
-| 特色 | 是 | 简单  | 否 | 是 | 是 | 是 | sql构建器 |
+| 语言支持 | JAVA | JAVA | JAVA | JAVA | 多语言 | JAVA | JAVA |
+| 特色 | 简单，ORM + JDBC + Sql构建器 | ORM | ORM | ORM+JDBC | 服务化JDBC | JDBC client | sql构建器 |
 
 
 - 注1：通过工厂实例的方法获取dao，代码样例：DaoFactory.create("logicTable");
@@ -324,3 +326,9 @@ assertEquals("DELETE FROM `order_1` WHERE `id` = '1' -- 2", sqlBuilder.buildOn("
 DELETE FROM `order_1` WHERE `id` = '1' -- 2
 ```
 上面的语句落入表order_1中，物理库的分片值为2。
+
+## 7. 联系 Contact
+我们的邮箱地址：peipeihh@qq.com，欢迎来信联系。
+
+## 8. 开源许可协议 License
+Apache License 2.0
