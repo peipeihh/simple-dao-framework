@@ -289,7 +289,6 @@ dao.update(order, new Hints().dbShardValue(i).tableShardValue(j));
 
 | 特性支持 | simple dao framework | MyBatis | Hibernate | Ctrip Dal | MyCat | Sharding-JDBC |  jOOQ |  
 | :--: | :--: | :--: | :--: | :--: | :--: | :--: |:--: |
-
 | POJO JPA Entity | YES | YES | YES | YES | - | - | YES |
 | POJO Entity<br/>自动生成 | No | No | No | Yes | - | - | Yes |
 | DAO实现 | 工厂实例（注1） | 继承 | 继承 | 继承 + 工厂实例 | - | - | 继承 |
