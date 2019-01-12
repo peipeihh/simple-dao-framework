@@ -1,5 +1,6 @@
 package com.pphh.dfw.jdbc;
 
+import com.pphh.dfw.core.jdbc.IDataSource;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 import java.sql.Connection;
@@ -15,10 +16,19 @@ import java.sql.Statement;
  */
 public class ConnectionTest {
 
-    public static void checkConnection(DataSource dataSource, String testSql) throws SQLException {
-        Connection con = null;
+    public static void checkDateSource(DataSource dataSource, String testSql) throws SQLException {
+        Connection con = dataSource.getConnection();
+        checkConnection(con, testSql);
+    }
+
+
+    public static void checkDateSource(IDataSource dataSource, String testSql) throws SQLException {
+        Connection con = dataSource.getConnection();
+        checkConnection(con, testSql);
+    }
+
+    private static void checkConnection(Connection con, String testSql) throws SQLException {
         try {
-            con = dataSource.getConnection();
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(testSql);
             int cnt = 1;
@@ -36,6 +46,7 @@ public class ConnectionTest {
             } catch (Exception ignore) {
             }
         }
+
     }
 
 }

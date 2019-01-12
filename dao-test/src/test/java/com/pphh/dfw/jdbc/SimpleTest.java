@@ -1,5 +1,6 @@
 package com.pphh.dfw.jdbc;
 
+import com.pphh.dfw.core.jdbc.IDataSource;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 public class SimpleTest {
 
     @Test
-    public void test2() throws SQLException {
+    public void test() throws SQLException {
         PoolProperties p = new PoolProperties();
         p.setUrl("jdbc:mysql://localhost:3306/database0");
         p.setDriverClassName("com.mysql.jdbc.Driver");
@@ -41,7 +42,13 @@ public class SimpleTest {
                         "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
         DataSource dataSource = new DataSource();
         dataSource.setPoolProperties(p);
-        ConnectionTest.checkConnection(dataSource, "select * from `database0`.order");
+        ConnectionTest.checkDateSource(dataSource, "select * from `database0`.order");
+    }
+
+    @Test
+    public void testTomcatJdbcPool() throws Exception {
+        IDataSource dataSource = new TomcatJdbcDataSource("db0");
+        ConnectionTest.checkDateSource(dataSource, "select * from `database0`.order");
     }
 
 }

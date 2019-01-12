@@ -132,13 +132,21 @@ public class LocalDSConfigLoader implements DataSourceConfigLoader {
     @Override
     public Map<String, PhysicalDBConfig> loadPhysical() throws Exception {
         Properties dbConfigProps = readProperty("/" + LOCAL_DB_CONFIG_FILE);
-        Properties dbPoolProps = readProperty("/" + LOCAL_DB_POOL_FILE);
-
         List<String> phyPrefixes = Stream.of(dbConfigProps.getProperty("physical.databases").split(","))
                 .map(String::trim)
                 .map(prefix -> String.format("physical.%s", prefix))
                 .collect(Collectors.toList());
         List<PhysicalDBConfig> physicalDBConfigList = parseArray(dbConfigProps, phyPrefixes, this::mapPhysicalDBConfig);
+
+        Properties dbPoolPropsOriginal = readProperty("/" + LOCAL_DB_POOL_FILE);
+        Properties dbPoolProps = new Properties();
+        for (String key : dbPoolPropsOriginal.stringPropertyNames()) {
+            dbPoolProps.put(key.replaceFirst("pool\\.", ""), dbPoolPropsOriginal.get(key));
+        }
+        physicalDBConfigList.forEach(physicalDBConfig -> {
+            physicalDBConfig.setPoolProperties(dbPoolProps);
+        });
+
         return ConvertUtils.map(physicalDBConfigList, PhysicalDBConfig::getId);
     }
 }

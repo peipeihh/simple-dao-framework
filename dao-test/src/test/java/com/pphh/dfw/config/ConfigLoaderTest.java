@@ -36,7 +36,7 @@ public class ConfigLoaderTest {
         p.setConnectionProperties(physicalDBConfig.getConnectionProperties());
 
         DataSource dataSource = new DataSource(p);
-        ConnectionTest.checkConnection(dataSource, testSql);
+        ConnectionTest.checkDateSource(dataSource, testSql);
     }
 
 }
