@@ -18,12 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author huangyinhuang
  * @date 9/26/2018
  */
-public class TomcatDataSource implements IDataSource {
+public class TomcatJdbcDataSource implements IDataSource {
 
     private static AtomicInteger count = new AtomicInteger();
     private DataSource dataSource;
 
-    public TomcatDataSource() throws Exception {
+    public TomcatJdbcDataSource() throws Exception {
         IDataSourceConfig instance = GlobalDataSourceConfig.getInstance().load();
 
         PhysicalDBConfig physicalDBConfig = instance.getPhysicalDBConfigMap("db0");
@@ -36,7 +36,7 @@ public class TomcatDataSource implements IDataSource {
         this.dataSource = new org.apache.tomcat.jdbc.pool.DataSource(p);
     }
 
-    public TomcatDataSource(PhysicalDBConfig physicalDBConfig) throws Exception {
+    public TomcatJdbcDataSource(PhysicalDBConfig physicalDBConfig) throws Exception {
         PoolProperties p = new PoolProperties();
         p.setUrl(physicalDBConfig.getConnectionUrl());
         p.setUsername(physicalDBConfig.getUserName());

@@ -8,7 +8,7 @@ import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.core.transform.ITransformer;
 import com.pphh.dfw.core.transform.Task;
 import com.pphh.dfw.core.transform.TaskResult;
-import com.pphh.dfw.jdbc.TomcatDataSource;
+import com.pphh.dfw.jdbc.TomcatJdbcDataSource;
 import com.pphh.dfw.table.GenericTable;
 
 import java.lang.reflect.Field;
@@ -33,7 +33,7 @@ public class Transformer implements ITransformer {
     public <T> TaskResult<T> run(Task task) throws Exception {
         String dbName = task.getDbName();
         PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
-        IDataSource dataSource = new TomcatDataSource(shardPhysicalDBConfig);
+        IDataSource dataSource = new TomcatJdbcDataSource(shardPhysicalDBConfig);
         Connection connection = connectionMap.get(dbName);
         if (connection == null) {
             connection = dataSource.getConnection();
