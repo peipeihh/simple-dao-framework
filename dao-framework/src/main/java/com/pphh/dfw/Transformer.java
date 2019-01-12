@@ -27,48 +27,58 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Transformer implements ITransformer {
 
-    private static Map<String, Connection> connectionMap = new ConcurrentHashMap<>();
+    private static Map<String, IDataSource> dataSourcePoolMap = new ConcurrentHashMap<>();
 
     @Override
     public <T> TaskResult<T> run(Task task) throws Exception {
         String dbName = task.getDbName();
         PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
-        IDataSource dataSource = new TomcatJdbcDataSource(shardPhysicalDBConfig);
-        Connection connection = connectionMap.get(dbName);
-        if (connection == null) {
-            connection = dataSource.getConnection();
-            connectionMap.put(dbName, connection);
+        IDataSource dataSource = dataSourcePoolMap.get(dbName);
+        if (dataSource == null) {
+            dataSource = new TomcatJdbcDataSource(shardPhysicalDBConfig);
+            dataSourcePoolMap.put(dbName, dataSource);
         }
+        Connection connection = dataSource.getConnection();
 
         TaskResult result = new TaskResult();
-        SqlTaskType taskType = task.getTaskType();
-        if (taskType == SqlTaskType.ExecuteQuery) {
-            // query for result set
-            PreparedStatement statement = connection.prepareStatement(task.getSql());
-            ResultSet resultSet = statement.executeQuery();
-            List<T> entities = convert(resultSet, task.getPojoClz());
-            resultSet.close();
-            statement.close();
-            result.setEntities(entities);
-            if (entities.size() > 0) {
-                result.setFirstEntity(entities.get(0));
+        try {
+
+            SqlTaskType taskType = task.getTaskType();
+            if (taskType == SqlTaskType.ExecuteQuery) {
+                // query for result set
+                PreparedStatement statement = connection.prepareStatement(task.getSql());
+                ResultSet resultSet = statement.executeQuery();
+                List<T> entities = convert(resultSet, task.getPojoClz());
+                resultSet.close();
+                statement.close();
+                result.setEntities(entities);
+                if (entities.size() > 0) {
+                    result.setFirstEntity(entities.get(0));
+                }
+            } else if (taskType == SqlTaskType.ExecuteUpdate) {
+                // a single update operation
+                PreparedStatement statement = connection.prepareStatement(task.getSql());
+                int rt = statement.executeUpdate();
+                statement.close();
+                result.setResult(rt);
+            } else if (taskType == SqlTaskType.ExecuteBatchUpdate) {
+                // a batch update operation
+                Statement statement = connection.createStatement();
+                List<String> sqls = task.getBatchSqls();
+                for (String sql : sqls) {
+                    statement.addBatch(sql);
+                }
+                int[] rts = statement.executeBatch();
+                statement.close();
+                result.setResults(rts);
             }
-        } else if (taskType == SqlTaskType.ExecuteUpdate) {
-            // a single update operation
-            PreparedStatement statement = connection.prepareStatement(task.getSql());
-            int rt = statement.executeUpdate();
-            statement.close();
-            result.setResult(rt);
-        } else if (taskType == SqlTaskType.ExecuteBatchUpdate) {
-            // a batch update operation
-            Statement statement = connection.createStatement();
-            List<String> sqls = task.getBatchSqls();
-            for (String sql : sqls) {
-                statement.addBatch(sql);
-            }
-            int[] rts = statement.executeBatch();
-            statement.close();
-            result.setResults(rts);
+
+        } catch (SQLException sqlException) {
+            throw sqlException;
+        } catch (Exception unknownException) {
+            throw unknownException;
+        } finally {
+            if (connection != null) connection.close();
         }
 
         return result;
