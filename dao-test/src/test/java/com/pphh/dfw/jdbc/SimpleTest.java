@@ -17,7 +17,7 @@ public class SimpleTest {
     @Test
     public void test2() throws SQLException {
         PoolProperties p = new PoolProperties();
-        p.setUrl("jdbc:mysql://localhost:3306/test");
+        p.setUrl("jdbc:mysql://localhost:3306/database0");
         p.setDriverClassName("com.mysql.jdbc.Driver");
         p.setUsername("root");
         p.setPassword("root");

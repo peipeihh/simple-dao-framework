@@ -73,7 +73,7 @@
 1. 准备Mysql数据库
    - 启动mysql数据库，执行初始化脚本（./docs/init.sql）
 2. 逻辑库表和物理库的配置
-   - 进入文件中（src/test/resources/dfw-db-config.properties）
+   - 进入文件中（dao-test/src/test/resources/dfw-db-config.properties）
    - 更新里面的物理库连接配置信息
 
    ```
@@ -93,7 +93,7 @@
    ```
 3. 运行单元测试
    - 进入测试项目
-   - 运行单元测试（src/test/java/com/pphh/dfw）
+   - 运行单元测试（dao-test/src/test/java/com/pphh/dfw）
    - 若一切正常，所有单元测试会全部通过。
 4. 查看单元测试
    - 进入测试项目中，查看里面各个单元测试，里面包括对dao/sqlb/hints/transaction的使用方法。
