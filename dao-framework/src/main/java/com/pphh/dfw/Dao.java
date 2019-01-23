@@ -221,11 +221,8 @@ public class Dao implements IDao {
 
             // 获取entity的各个字段定义，生成sql
             ISqlBuilder sqlBuilder = new SqlBuilder();
-            if (hints == null) {
-                sqlBuilder.hints(getShardHints(table));
-            } else {
-                sqlBuilder.hints(hints);
-            }
+            sqlBuilder.hints(getShardHints(table));
+            sqlBuilder.appendHints(hints);
             sqlBuilder.into((Class<? extends T>) entity.getClass());
 
             List<ITableField> fields = table.getFields();
@@ -334,11 +331,8 @@ public class Dao implements IDao {
 
             // 获取entity的各个字段定义，生成sql
             ISqlBuilder sqlBuilder = new SqlBuilder();
-            if (hints == null) {
-                sqlBuilder.hints(getShardHints(table));
-            } else {
-                sqlBuilder.hints(hints);
-            }
+            sqlBuilder.hints(getShardHints(table));
+            sqlBuilder.appendHints(hints);
             sqlBuilder.into((Class<? extends T>) entity.getClass());
 
             ITableField primaryKey = table.getPkField();
@@ -373,11 +367,8 @@ public class Dao implements IDao {
 
             // 获取entity的各个字段定义，生成sql
             ISqlBuilder sqlBuilder = new SqlBuilder();
-            if (hints == null) {
-                sqlBuilder.hints(getShardHints(table));
-            } else {
-                sqlBuilder.hints(hints);
-            }
+            sqlBuilder.hints(getShardHints(table));
+            sqlBuilder.appendHints(hints);
             sqlBuilder.into((Class<? extends T>) entity.getClass());
 
             List<ITableField> fields = table.getFields();
@@ -456,12 +447,7 @@ public class Dao implements IDao {
             // 获取entity的各个字段定义，生成sql
             ISqlBuilder sqlBuilder = new SqlBuilder();
             sqlBuilder.hints(getShardHints(table));
-            sqlBuilder.hints(hints);
-//            if (hints == null) {
-//                sqlBuilder.hints(getShardHints(table));
-//            } else {
-//                sqlBuilder.hints(hints);
-//            }
+            sqlBuilder.appendHints(hints);
             sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
             ITableField primaryKey = table.getPkField();
@@ -493,7 +479,7 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> T queryForObject(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
-        sqlBuilder.hints(hints);
+        sqlBuilder.appendHints(hints);
         String sql = sqlBuilder.buildOn(this);
         DfwSql dfwSql = parse(sql);
         Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
@@ -509,7 +495,7 @@ public class Dao implements IDao {
 
     @Override
     public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
-        sqlBuilder.hints(hints);
+        sqlBuilder.appendHints(hints);
         String sql = sqlBuilder.buildOn(this);
         System.out.println(sql);
         DfwSql dfwSql = parse(sql);

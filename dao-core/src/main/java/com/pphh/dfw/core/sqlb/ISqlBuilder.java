@@ -83,6 +83,8 @@ public interface ISqlBuilder {
 
     ISqlBuilder hints(IHints hints);
 
+    ISqlBuilder appendHints(IHints hints);
+
     ISqlBuilder into(Class clazz);
 
     IHints getHints();

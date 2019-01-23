@@ -276,6 +276,13 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public ISqlBuilder hints(IHints hints) {
+        this.hints = new Hints();
+        if (hints != null) appendHints(hints);
+        return this;
+    }
+
+    @Override
+    public ISqlBuilder appendHints(IHints hints) {
         if (hints != null) {
             for (HintEnum hintEnum : HintEnum.values()) {
                 if (hints.getHintValue(hintEnum) != null) {
