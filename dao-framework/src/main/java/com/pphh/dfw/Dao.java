@@ -163,9 +163,7 @@ public class Dao implements IDao {
         }
         sqlBuilder.selectCount().from(table).where(conditions.toArray(new ISqlSegement[conditions.size()]));
 
-        // FIXME fetch the count of sql query
-        List<T> results = this.queryForList(sqlBuilder);
-        return results.size();
+        return this.count(sqlBuilder);
     }
 
     @Override
@@ -506,6 +504,21 @@ public class Dao implements IDao {
     }
 
     @Override
+    public int count(ISqlBuilder sqlBuilder) throws Exception {
+        return count(sqlBuilder, null);
+    }
+
+    public int count(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
+        sqlBuilder.appendHints(hints);
+        String sql = sqlBuilder.buildOn(this);
+        System.out.println(sql);
+        DfwSql dfwSql = parse(sql);
+        Task task = new Task(SqlTaskType.ExecuteQueryCount, dfwSql.getSql(), null, dfwSql.getDb(), null);
+        TaskResult taskResult = transformer.run(task);
+        return taskResult.getCount();
+    }
+
+    @Override
     public int execute(Function function) throws Exception {
         return 0;
     }
@@ -516,22 +529,22 @@ public class Dao implements IDao {
     }
 
     @Override
-    public int run(ISqlBuilder sqlBuilder) throws Exception {
-        return executeUpdate(sqlBuilder);
+    public int run(ISqlBuilder updateSqlBuilder) throws Exception {
+        return executeUpdate(updateSqlBuilder);
     }
 
     @Override
-    public int run(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
+    public int run(ISqlBuilder updateSqlBuilder, IHints hints) throws Exception {
         return 0;
     }
 
     @Override
-    public int[] run(IBatchSqlBuilder sqlBuilder) throws Exception {
+    public int[] run(IBatchSqlBuilder updateSqlBuilder) throws Exception {
         return new int[0];
     }
 
     @Override
-    public int[] run(IBatchSqlBuilder sqlBuilder, IHints hints) throws Exception {
+    public int[] run(IBatchSqlBuilder updateSqlBuilder, IHints hints) throws Exception {
         return new int[0];
     }
 

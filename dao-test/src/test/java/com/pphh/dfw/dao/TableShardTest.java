@@ -131,17 +131,32 @@ public class TableShardTest extends BaseTest {
         }
     }
 
-    @Ignore
     @Test
     public void testCountBySample() throws Exception {
+
         for (int j = 1; j < TABLE_MOD * 3 + 1; j++) {
             OrderEntity order = new OrderEntity();
             order.setId(j);
             order.setCityID(j * 10 + 1);
             order.setCountryID(j * 100 + 1);
             long count = dao.countBySample(order);
-            Assert.assertEquals(TABLE_MOD * 3, count);
+            Assert.assertEquals(1, count);
         }
+
+        for (int j = 1; j < TABLE_MOD * 3 + 1; j++) {
+            OrderEntity order = new OrderEntity();
+            order.setName("apple");
+            long count = dao.countBySample(order, new Hints().tableShardValue(j));
+            Assert.assertEquals(TABLE_MOD, count);
+        }
+
+        for (int j = 1; j < TABLE_MOD * 3 + 1; j++) {
+            OrderEntity order = new OrderEntity();
+            order.setName("apple");
+            long count = dao.countBySample(order, new Hints().inTableShard(j % TABLE_MOD));
+            Assert.assertEquals(TABLE_MOD, count);
+        }
+
     }
 
     @Test

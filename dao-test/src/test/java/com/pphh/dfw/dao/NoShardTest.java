@@ -89,13 +89,22 @@ public class NoShardTest extends BaseTest {
         }
     }
 
-    @Ignore
     @Test
     public void testCountBySample() throws Exception {
         OrderEntity order = new OrderEntity();
         order.setName("apple");
         long count = dao.countBySample(order);
-        Assert.assertEquals(TABLE_MOD - 1, count);
+        Assert.assertEquals(TABLE_MOD, count);
+
+        for (int k = 0; k < TABLE_MOD; k++) {
+            OrderEntity sample = new OrderEntity();
+            sample.setName("apple");
+            sample.setCityID(k * 10 + 1);
+            sample.setCountryID(k * 100 + 1);
+
+            count = dao.countBySample(sample);
+            Assert.assertEquals(1, count);
+        }
     }
 
     @Test

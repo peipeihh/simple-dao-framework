@@ -136,7 +136,6 @@ public class DbTableShardTest extends BaseTest {
         }
     }
 
-    @Ignore
     @Test
     public void testCountBySample() throws Exception {
         for (int i = 0; i < DB_MOD; i++) {
@@ -145,6 +144,24 @@ public class DbTableShardTest extends BaseTest {
                 order.setCityID(i);
                 order.setCountryID(j);
                 long count = dao.countBySample(order);
+                Assert.assertEquals(TABLE_MOD, count);
+            }
+        }
+
+        for (int i = 1; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                OrderEntity order = new OrderEntity();
+                order.setName("apple");
+                long count = dao.countBySample(order, new Hints().dbShardValue(i).tableShardValue(j));
+                Assert.assertEquals(TABLE_MOD, count);
+            }
+        }
+
+        for (int i = 1; i < DB_MOD; i++) {
+            for (int j = 0; j < TABLE_MOD; j++) {
+                OrderEntity order = new OrderEntity();
+                order.setName("apple");
+                long count = dao.countBySample(order, new Hints().inDbShard(i).inTableShard(j));
                 Assert.assertEquals(TABLE_MOD, count);
             }
         }

@@ -49,18 +49,27 @@ public class Transformer implements ITransformer {
                 PreparedStatement statement = connection.prepareStatement(task.getSql());
                 ResultSet resultSet = statement.executeQuery();
                 List<T> entities = convert(resultSet, task.getPojoClz());
-                resultSet.close();
-                statement.close();
                 result.setEntities(entities);
                 if (entities.size() > 0) {
                     result.setFirstEntity(entities.get(0));
                 }
+                resultSet.close();
+                statement.close();
+            } else if (taskType == SqlTaskType.ExecuteQueryCount) {
+                // query by count
+                PreparedStatement statement = connection.prepareStatement(task.getSql());
+                ResultSet resultSet = statement.executeQuery();
+                resultSet.last();
+                int count = resultSet.getInt(1);
+                result.setCount(count);
+                resultSet.close();
+                statement.close();
             } else if (taskType == SqlTaskType.ExecuteUpdate) {
                 // a single update operation
                 PreparedStatement statement = connection.prepareStatement(task.getSql());
                 int rt = statement.executeUpdate();
-                statement.close();
                 result.setResult(rt);
+                statement.close();
             } else if (taskType == SqlTaskType.ExecuteBatchUpdate) {
                 // a batch update operation
                 Statement statement = connection.createStatement();
@@ -69,8 +78,8 @@ public class Transformer implements ITransformer {
                     statement.addBatch(sql);
                 }
                 int[] rts = statement.executeBatch();
-                statement.close();
                 result.setResults(rts);
+                statement.close();
             }
 
         } catch (SQLException sqlException) {

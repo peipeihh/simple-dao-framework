@@ -10,10 +10,16 @@ import java.util.List;
  */
 public class TaskResult<T> {
 
+    // 单个sql执行结果，1表示成功，0表示失败
     private int result;
+    // 批量sql执行结果
     private int[] results;
+    // 查询sql获取的第一个记录实例对象
     private T firstEntity;
+    // 查询sql获取的记录实例对象列表
     private List<T> entities;
+    // 统计sql查询的结果，执行的sql样例：select count() from table
+    private int count;
 
     public int getResult() {
         return result;
@@ -46,4 +52,13 @@ public class TaskResult<T> {
     public void setEntities(List<T> entities) {
         this.entities = entities;
     }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
 }

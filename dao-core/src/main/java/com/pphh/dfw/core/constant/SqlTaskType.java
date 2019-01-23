@@ -9,6 +9,7 @@ package com.pphh.dfw.core.constant;
 public enum SqlTaskType {
 
     ExecuteQuery,
+    ExecuteQueryCount,
     ExecuteUpdate,
     ExecuteBatchQuery,
     ExecuteBatchUpdate,

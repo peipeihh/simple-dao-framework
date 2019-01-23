@@ -71,19 +71,23 @@ public interface IDao {
 
     <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder, IHints hints) throws Exception;
 
+    int count(ISqlBuilder sqlBuilder) throws Exception;
+
+    int count(ISqlBuilder sqlBuilder, IHints hints) throws Exception;
+
     //<T extends IEntity> Page<T> queryByPage(T entity, Object pageable);
 
     int execute(Function function) throws Exception;
 
     int execute(Function function, IHints hints) throws Exception;
 
-    int run(ISqlBuilder sqlBuilder) throws Exception;
+    int run(ISqlBuilder updateSqlBuilder) throws Exception;
 
-    int run(ISqlBuilder sqlBuilder, IHints hints) throws Exception;
+    int run(ISqlBuilder updateSqlBuilder, IHints hints) throws Exception;
 
-    int[] run(IBatchSqlBuilder sqlBuilder) throws Exception;
+    int[] run(IBatchSqlBuilder updateSqlBuilder) throws Exception;
 
-    int[] run(IBatchSqlBuilder sqlBuilder, IHints hints) throws Exception;
+    int[] run(IBatchSqlBuilder updateSqlBuilder, IHints hints) throws Exception;
 
     String getLogicName();
 
