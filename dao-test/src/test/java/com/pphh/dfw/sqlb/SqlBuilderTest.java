@@ -1,6 +1,7 @@
 package com.pphh.dfw.sqlb;
 
 import com.pphh.dfw.BaseTest;
+import com.pphh.dfw.core.exception.DfwException;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -26,7 +27,7 @@ public class SqlBuilderTest extends BaseTest {
      * 通过append实现简单的sql语句叠加
      */
     @Test
-    public void testPlainSql() {
+    public void testPlainSql() throws DfwException {
         sql = sqlBuilder().append("DELETE FROM `order`");
         Assert.assertEquals("DELETE FROM `order`", sql.build());
 

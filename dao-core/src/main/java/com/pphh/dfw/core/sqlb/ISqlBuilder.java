@@ -2,6 +2,7 @@ package com.pphh.dfw.core.sqlb;
 
 import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.dao.IDao;
+import com.pphh.dfw.core.exception.DfwException;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
@@ -88,7 +89,7 @@ public interface ISqlBuilder {
 
     String build();
 
-    String buildOn(IDao dao);
+    String buildOn(IDao dao) throws DfwException;
 
     /**
      * 执行select语句

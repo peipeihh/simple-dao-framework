@@ -455,11 +455,13 @@ public class Dao implements IDao {
 
             // 获取entity的各个字段定义，生成sql
             ISqlBuilder sqlBuilder = new SqlBuilder();
-            if (hints == null) {
-                sqlBuilder.hints(getShardHints(table));
-            } else {
-                sqlBuilder.hints(hints);
-            }
+            sqlBuilder.hints(getShardHints(table));
+            sqlBuilder.hints(hints);
+//            if (hints == null) {
+//                sqlBuilder.hints(getShardHints(table));
+//            } else {
+//                sqlBuilder.hints(hints);
+//            }
             sqlBuilder.into((Class<? extends T>) entityWithPk.getClass());
 
             ITableField primaryKey = table.getPkField();

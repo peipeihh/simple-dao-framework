@@ -35,7 +35,7 @@ public class TableShardTest extends BaseTest {
         for (int j = 1; j < TABLE_MOD * 3 + 1; j++) {
             String sql = String.format("INSERT INTO `order_%d` (`id`, `name`, `city_id`, `country_id`) VALUES ('%s', '%s', '%s', '%s')", j % TABLE_MOD, j, "apple", j * 10 + 1, j * 100 + 1);
             builder = sqlBuilder().append(sql).hints(new Hints().tableShardValue(j));
-            tableDbShardDao.run(builder);
+            tableShardDao.run(builder);
         }
     }
 
@@ -735,21 +735,21 @@ public class TableShardTest extends BaseTest {
         }
 
         // 当前表中无orders_table1的数据字段，因而更新结果为0
-        int[] results = dao.update(orders_table1, new Hints().inDbShard(0));
+        int[] results = dao.update(orders_table1, new Hints().inTableShard(0));
         Assert.assertEquals(orders_table1.size(), results.length);
         for (int result : results) {
             Assert.assertEquals(0, result);
         }
 
         // 当前表中无orders_table0的数据字段，因而更新结果为0
-        results = dao.update(orders_table0, new Hints().dbShardValue(1));
+        results = dao.update(orders_table0, new Hints().tableShardValue(1));
         Assert.assertEquals(orders_table0.size(), results.length);
         for (int result : results) {
             Assert.assertEquals(0, result);
         }
 
         // 当前表中无orders_table1的数据字段，因而更新结果为0
-        results = dao.update(orders_table1, new Hints().dbShardValue(2));
+        results = dao.update(orders_table1, new Hints().tableShardValue(2));
         Assert.assertEquals(orders_table1.size(), results.length);
         for (int result : results) {
             Assert.assertEquals(0, result);

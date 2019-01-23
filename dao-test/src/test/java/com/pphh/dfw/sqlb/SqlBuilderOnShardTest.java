@@ -3,6 +3,7 @@ package com.pphh.dfw.sqlb;
 import com.pphh.dfw.BaseTest;
 
 import com.pphh.dfw.Hints;
+import com.pphh.dfw.core.exception.DfwException;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,7 +19,7 @@ import static com.pphh.dfw.sqlb.SqlStarter.*;
 public class SqlBuilderOnShardTest extends BaseTest {
 
     @Test
-    public void testSimpleShard() {
+    public void testSimpleShard() throws DfwException {
         ISqlBuilder sqlBuilder = deleteFrom(order).where(order.id.equal(1));
         sqlBuilder.getHints().dbShardValue(1).tableShardValue(1);
         Assert.assertEquals("DELETE FROM `order` WHERE `id` = '1'", sqlBuilder.buildOn(noShardDao));
@@ -28,7 +29,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
     }
 
     @Test
-    public void testSelect() {
+    public void testSelect() throws DfwException {
 
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
@@ -55,7 +56,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
     }
 
     @Test
-    public void testInsert() {
+    public void testInsert() throws DfwException {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 ISqlBuilder sql = insertInto(order, order.id, order.name).values("1", "apple").hints(new Hints().dbShardValue(i).tableShardValue(j));
@@ -80,7 +81,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() throws DfwException {
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {
                 ISqlBuilder sql = update(order).set(order.id.equal(2), order.name.equal("banana")).hints(new Hints().dbShardValue(i).tableShardValue(j));
@@ -105,7 +106,7 @@ public class SqlBuilderOnShardTest extends BaseTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testDelete() throws DfwException {
 
         for (int i = 0; i < DB_MOD; i++) {
             for (int j = 0; j < TABLE_MOD; j++) {

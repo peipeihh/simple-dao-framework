@@ -16,9 +16,9 @@ import com.pphh.dfw.core.sqlb.SqlKeyWord;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
+import com.pphh.dfw.core.exception.DfwException;
 import com.pphh.dfw.table.GenericTable;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -276,9 +276,11 @@ public class SqlBuilder implements ISqlBuilder {
 
     @Override
     public ISqlBuilder hints(IHints hints) {
-        for (HintEnum hintEnum : HintEnum.values()) {
-            if (hints.getHintValue(hintEnum) != null) {
-                this.hints.setHintValue(hintEnum, hints.getHintValue(hintEnum));
+        if (hints != null) {
+            for (HintEnum hintEnum : HintEnum.values()) {
+                if (hints.getHintValue(hintEnum) != null) {
+                    this.hints.setHintValue(hintEnum, hints.getHintValue(hintEnum));
+                }
             }
         }
         return this;
@@ -301,7 +303,7 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     @Override
-    public String buildOn(IDao dao) {
+    public String buildOn(IDao dao) throws DfwException {
         return buildOn(dao.getLogicName());
     }
 
@@ -315,7 +317,7 @@ public class SqlBuilder implements ISqlBuilder {
         return 0;
     }
 
-    private String buildOn(String logicDb) {
+    private String buildOn(String logicDb) throws DfwException {
         // 加载逻辑数据库配置
         String tableShard = null;
         String dbShard = null;
@@ -343,6 +345,11 @@ public class SqlBuilder implements ISqlBuilder {
                     } else if (dbShardValue != null) {
                         dbShard = strategy.locateDbShard(dbShardValue.toString(), Boolean.TRUE);
                     }
+
+                    if (dbShardId == null && dbShardValue == null) {
+                        throw new DfwException(String.format("This dao requires db shard, but no shard id/value is found to column [%s]. " +
+                                "Please specify shard id/value before building sql.", logicDBConfig.getDbShardColumn()));
+                    }
                 }
 
                 if (logicDBConfig.getTableShardColumn() != null && !logicDBConfig.getTableShardColumn().isEmpty()) {
@@ -350,6 +357,11 @@ public class SqlBuilder implements ISqlBuilder {
                         tableShard = strategy.locateTableShard(tableShardId.toString(), Boolean.FALSE);
                     } else if (tableShardValue != null) {
                         tableShard = strategy.locateTableShard(tableShardValue.toString(), Boolean.TRUE);
+                    }
+
+                    if (tableShardId == null && tableShardValue == null) {
+                        throw new DfwException(String.format("This dao requires table shard, but no shard id/value is found to column [%s]. " +
+                                "Please specify shard id/value before building sql.", logicDBConfig.getTableShardColumn()));
                     }
                 }
 

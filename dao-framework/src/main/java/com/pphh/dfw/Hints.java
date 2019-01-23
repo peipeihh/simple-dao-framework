@@ -55,13 +55,13 @@ public class Hints implements IHints {
 
     @Override
     public IHints dbShardValue(Object value) {
-        hints.put(HintEnum.DB_SHARD_VALUE, value);
+        if (value != null) hints.put(HintEnum.DB_SHARD_VALUE, value);
         return this;
     }
 
     @Override
     public IHints tableShardValue(Object value) {
-        hints.put(HintEnum.TABLE_SHARD_VALUE, value);
+        if (value != null) hints.put(HintEnum.TABLE_SHARD_VALUE, value);
         return this;
     }
 
