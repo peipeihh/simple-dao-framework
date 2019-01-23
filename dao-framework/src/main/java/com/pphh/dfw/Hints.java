@@ -37,19 +37,19 @@ public class Hints implements IHints {
 
     @Override
     public IHints sqlDialect(SqlProviderEnum dialect) {
-        hints.put(HintEnum.SQL_DIALECT, dialect);
+        if (dialect != null) hints.put(HintEnum.SQL_DIALECT, dialect);
         return this;
     }
 
     @Override
     public IHints inDbShard(Object value) {
-        hints.put(HintEnum.DB_SHARD, value);
+        if (value != null) hints.put(HintEnum.DB_SHARD, value);
         return this;
     }
 
     @Override
     public IHints inTableShard(Object value) {
-        hints.put(HintEnum.TABLE_SHARD, value);
+        if (value != null) hints.put(HintEnum.TABLE_SHARD, value);
         return this;
     }
 
@@ -67,7 +67,7 @@ public class Hints implements IHints {
 
     @Override
     public IHints into(Class clazz) {
-        hints.put(HintEnum.POJO_CLASS, clazz);
+        if (clazz != null) hints.put(HintEnum.POJO_CLASS, clazz);
         return this;
     }
 
@@ -78,7 +78,7 @@ public class Hints implements IHints {
 
     @Override
     public void setHintValue(HintEnum hintEnum, Object value) {
-        hints.put(hintEnum, value);
+        if (value != null) hints.put(hintEnum, value);
     }
 
     @Override
