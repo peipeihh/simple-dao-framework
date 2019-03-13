@@ -20,19 +20,23 @@ public class TaskFactory {
         return ourInstance;
     }
 
-    public Task createSingleQueryTask(String querySql, String dbName, Class pojoClz) {
+    public Task getQueryTask(String querySql, String dbName, Class pojoClz) {
         return new Task(SqlTaskType.ExecuteQuery, querySql, null, dbName, pojoClz);
     }
 
-    public Task createSingleUpdateTask(String updateSql, String dbName, Class pojoClz) {
+    public Task getCountTask(String querySql, String dbName) {
+        return new Task(SqlTaskType.ExecuteQueryCount, querySql, null, dbName, null);
+    }
+
+    public Task getUpdateTask(String updateSql, String dbName, Class pojoClz) {
         return new Task(SqlTaskType.ExecuteUpdate, updateSql, null, dbName, pojoClz);
     }
 
-    public Task executeBatchQueryTask(List<String> querySqlList, String dbName, Class pojoClz) {
+    public Task getBatchQueryTask(List<String> querySqlList, String dbName, Class pojoClz) {
         return new Task(SqlTaskType.ExecuteBatchQuery, null, querySqlList, dbName, pojoClz);
     }
 
-    public Task executeBatchUpdateTask(List<String> updateSqlList, String dbName, Class pojoClz) {
+    public Task getBatchUpdateTask(List<String> updateSqlList, String dbName, Class pojoClz) {
         return new Task(SqlTaskType.ExecuteBatchUpdate, null, updateSqlList, dbName, pojoClz);
     }
 

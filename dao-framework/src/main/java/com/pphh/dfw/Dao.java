@@ -12,6 +12,7 @@ import com.pphh.dfw.core.sqlb.ISqlSegement;
 import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.core.transform.Task;
+import com.pphh.dfw.core.transform.TaskFactory;
 import com.pphh.dfw.core.transform.TaskResult;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import com.pphh.dfw.table.GenericTable;
@@ -481,7 +482,7 @@ public class Dao implements IDao {
         String sql = sqlBuilder.buildOn(this);
         DfwSql dfwSql = parse(sql);
         Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
-        Task task = new Task(SqlTaskType.ExecuteQuery, dfwSql.getSql(), null, dfwSql.getDb(), pojoClz);
+        Task task = TaskFactory.getInstance().getQueryTask(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
         TaskResult taskResult = transformer.run(task);
         return (T) taskResult.getFirstEntity();
     }
@@ -498,7 +499,7 @@ public class Dao implements IDao {
         System.out.println(sql);
         DfwSql dfwSql = parse(sql);
         Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
-        Task task = new Task(SqlTaskType.ExecuteQuery, dfwSql.getSql(), null, dfwSql.getDb(), pojoClz);
+        Task task = TaskFactory.getInstance().getQueryTask(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
         TaskResult taskResult = transformer.run(task);
         return taskResult.getEntities();
     }
@@ -513,7 +514,7 @@ public class Dao implements IDao {
         String sql = sqlBuilder.buildOn(this);
         System.out.println(sql);
         DfwSql dfwSql = parse(sql);
-        Task task = new Task(SqlTaskType.ExecuteQueryCount, dfwSql.getSql(), null, dfwSql.getDb(), null);
+        Task task = TaskFactory.getInstance().getCountTask(dfwSql.getSql(), dfwSql.getDb());
         TaskResult taskResult = transformer.run(task);
         return taskResult.getCount();
     }
@@ -530,12 +531,13 @@ public class Dao implements IDao {
 
     @Override
     public int run(ISqlBuilder updateSqlBuilder) throws Exception {
-        return executeUpdate(updateSqlBuilder);
+        return run(updateSqlBuilder, null);
     }
 
     @Override
     public int run(ISqlBuilder updateSqlBuilder, IHints hints) throws Exception {
-        return 0;
+        updateSqlBuilder.appendHints(hints);
+        return executeUpdate(updateSqlBuilder);
     }
 
     @Override
@@ -622,7 +624,7 @@ public class Dao implements IDao {
                 values.add(sqlEntry.getValue());
             }
 
-            Task task = new Task(SqlTaskType.ExecuteBatchUpdate, null, values, dbName, null);
+            Task task = TaskFactory.getInstance().getBatchUpdateTask(values, dbName, null);
             TaskResult taskResult = transformer.run(task);
             int[] dbShardResults = taskResult.getResults();
 
@@ -647,10 +649,9 @@ public class Dao implements IDao {
         String sql = singleSqlBuilder.buildOn(this);
         System.out.println(sql);
         DfwSql dfwSql = parse(sql);
-        Task task = new Task(SqlTaskType.ExecuteUpdate, dfwSql.getSql(), null, dfwSql.getDb(), null);
+        Task task = TaskFactory.getInstance().getUpdateTask(dfwSql.getSql(), dfwSql.getDb(), null);
         TaskResult tResult = transformer.run(task);
         return tResult.getResult();
-        //return transformer.run(dfwSql.getSql(), dfwSql.getDb());
     }
 
     private DfwSql parse(String sql) {
