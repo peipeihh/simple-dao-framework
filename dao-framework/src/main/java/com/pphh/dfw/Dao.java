@@ -16,6 +16,8 @@ import com.pphh.dfw.core.transform.TaskFactory;
 import com.pphh.dfw.core.transform.TaskResult;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import com.pphh.dfw.table.GenericTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ import static com.pphh.dfw.core.sqlb.SqlConstant.*;
  * @date 9/21/2018
  */
 public class Dao implements IDao {
+
+    private final static Logger log = LoggerFactory.getLogger(Dao.class);
 
     private final String logicDbName;
     private EntityParser entityParser;
@@ -498,7 +502,7 @@ public class Dao implements IDao {
     public <T extends IEntity> List<T> queryForList(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
         sqlBuilder.appendHints(hints);
         String sql = sqlBuilder.buildOn(this);
-        System.out.println(sql);
+        log.debug(sql);
         DfwSql dfwSql = parse(sql);
         Class<? extends T> pojoClz = (Class<? extends T>) sqlBuilder.getHints().getHintValue(HintEnum.POJO_CLASS);
         Task task = TaskFactory.getInstance().getQueryTask(dfwSql.getSql(), dfwSql.getDb(), pojoClz);
@@ -514,7 +518,7 @@ public class Dao implements IDao {
     public int count(ISqlBuilder sqlBuilder, IHints hints) throws Exception {
         sqlBuilder.appendHints(hints);
         String sql = sqlBuilder.buildOn(this);
-        System.out.println(sql);
+        log.debug(sql);
         DfwSql dfwSql = parse(sql);
         Task task = TaskFactory.getInstance().getCountTask(dfwSql.getSql(), dfwSql.getDb());
         TaskResult taskResult = transformer.run(task);
@@ -659,7 +663,7 @@ public class Dao implements IDao {
 
     private int executeUpdate(ISqlBuilder singleSqlBuilder) throws Exception {
         String sql = singleSqlBuilder.buildOn(this);
-        System.out.println(sql);
+        log.debug(sql);
         DfwSql dfwSql = parse(sql);
         Task task = TaskFactory.getInstance().getUpdateTask(dfwSql.getSql(), dfwSql.getDb(), null);
         TaskResult tResult = transformer.run(task);

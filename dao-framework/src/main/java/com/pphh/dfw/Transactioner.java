@@ -1,6 +1,8 @@
 package com.pphh.dfw;
 
 import com.pphh.dfw.core.exception.DfwException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,6 +16,8 @@ import java.util.function.Consumer;
  * @date 3/13/2019
  */
 public class Transactioner {
+
+    private final static Logger log = LoggerFactory.getLogger(Transactioner.class);
 
     private static ThreadLocal<Boolean> trancOn = new ThreadLocal<>();
     private static ThreadLocal<AtomicInteger> trancDepth = new ThreadLocal<>();
@@ -86,12 +90,14 @@ public class Transactioner {
         } catch (Exception e) {
             rt = 1;
             e.printStackTrace();
+            log.info("received an exception when executing the transaction, msg = ", e.getMessage());
             Connection connection = Transactioner.connLocal.get();
             if (connection != null) {
                 try {
                     connection.rollback();
                 } catch (SQLException sqlException) {
                     sqlException.printStackTrace();
+                    log.info("received an exception when trying rollback the transaction, msg = ", sqlException.getMessage());
                 }
             }
         } finally {
@@ -104,6 +110,7 @@ public class Transactioner {
                     connection.close();
                 } catch (SQLException sqlException) {
                     sqlException.printStackTrace();
+                    log.info("received an exception when trying close the transaction, msg = ", sqlException.getMessage());
                 }
                 Transactioner.trancOn.set(null);
                 Transactioner.trancDbName.set(null);

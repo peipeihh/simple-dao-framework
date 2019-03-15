@@ -10,6 +10,8 @@ import com.pphh.dfw.core.transform.Task;
 import com.pphh.dfw.core.transform.TaskResult;
 import com.pphh.dfw.jdbc.TomcatJdbcDataSource;
 import com.pphh.dfw.table.GenericTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -25,6 +27,7 @@ import java.util.List;
  */
 public class Transformer implements ITransformer {
 
+    final static Logger log = LoggerFactory.getLogger(Transformer.class);
 
     @Override
     public <T> TaskResult<T> run(Task task) throws Exception {
