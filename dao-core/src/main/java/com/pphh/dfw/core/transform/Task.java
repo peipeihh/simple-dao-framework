@@ -3,6 +3,8 @@ package com.pphh.dfw.core.transform;
 import com.pphh.dfw.core.constant.SqlTaskType;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Please add description here.
@@ -17,6 +19,8 @@ public class Task {
     private String sql;
     private List<String> batchSqls;
     private String dbName;
+    private Function function;
+    private Consumer consumer;
 
     public Task(SqlTaskType taskType, String sql, List<String> batchSqls, String dbName, Class pojoClz) {
         this.taskType = taskType;
@@ -66,4 +70,19 @@ public class Task {
         this.sql = sql;
     }
 
+    public Function getFunction() {
+        return function;
+    }
+
+    public void setFunction(Function function) {
+        this.function = function;
+    }
+
+    public Consumer getConsumer() {
+        return consumer;
+    }
+
+    public void setConsumer(Consumer consumer) {
+        this.consumer = consumer;
+    }
 }

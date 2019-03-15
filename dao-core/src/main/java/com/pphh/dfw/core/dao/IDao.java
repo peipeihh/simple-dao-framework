@@ -5,6 +5,7 @@ import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -76,6 +77,10 @@ public interface IDao {
     int count(ISqlBuilder sqlBuilder, IHints hints) throws Exception;
 
     //<T extends IEntity> Page<T> queryByPage(T entity, Object pageable);
+
+    int execute(Consumer consumer) throws Exception;
+
+    int execute(Consumer consumer, IHints hints) throws Exception;
 
     int execute(Function function) throws Exception;
 

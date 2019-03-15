@@ -1,7 +1,10 @@
 package com.pphh.dfw.core.exception;
 
 /**
- * Created by Shanzhen on 2019/1/23.
+ * Please add description here.
+ *
+ * @author huangyinhuang
+ * @date 2019/1/23
  */
 public class DfwException extends Exception {
 

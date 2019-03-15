@@ -16,8 +16,6 @@ import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Please add description here.
@@ -27,18 +25,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Transformer implements ITransformer {
 
-    private static Map<String, IDataSource> dataSourcePoolMap = new ConcurrentHashMap<>();
 
     @Override
     public <T> TaskResult<T> run(Task task) throws Exception {
         String dbName = task.getDbName();
-        PhysicalDBConfig shardPhysicalDBConfig = GlobalDataSourceConfig.getInstance().getPhysicalDBConfigMap(dbName);
-        IDataSource dataSource = dataSourcePoolMap.get(dbName);
-        if (dataSource == null) {
-            dataSource = new TomcatJdbcDataSource(shardPhysicalDBConfig);
-            dataSourcePoolMap.put(dbName, dataSource);
+
+        Boolean isTrancOn;
+        Connection connection = Transactioner.getInstance().getConnection(dbName);
+        if (connection != null) {
+            isTrancOn = Boolean.TRUE;
+        } else {
+            connection = DataSourceManager.getInstance().getConnection(dbName);
+            isTrancOn = Boolean.FALSE;
         }
-        Connection connection = dataSource.getConnection();
 
         TaskResult result = new TaskResult();
         try {
@@ -84,10 +83,10 @@ public class Transformer implements ITransformer {
 
         } catch (SQLException sqlException) {
             throw sqlException;
-        } catch (Exception unknownException) {
-            throw unknownException;
         } finally {
-            if (connection != null) connection.close();
+            if (connection != null && !isTrancOn) {
+                connection.close();
+            }
         }
 
         return result;

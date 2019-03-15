@@ -17,10 +17,12 @@ import com.pphh.dfw.core.transform.TaskResult;
 import com.pphh.dfw.sqlb.SqlBuilder;
 import com.pphh.dfw.table.GenericTable;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.pphh.dfw.core.sqlb.SqlConstant.*;
@@ -517,6 +519,16 @@ public class Dao implements IDao {
         Task task = TaskFactory.getInstance().getCountTask(dfwSql.getSql(), dfwSql.getDb());
         TaskResult taskResult = transformer.run(task);
         return taskResult.getCount();
+    }
+
+    @Override
+    public int execute(Consumer consumer) throws Exception {
+        return Transactioner.getInstance().execute(consumer);
+    }
+
+    @Override
+    public int execute(Consumer consumer, IHints hints) throws Exception {
+        return 0;
     }
 
     @Override

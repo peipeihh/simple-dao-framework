@@ -12,6 +12,6 @@ public enum SqlTaskType {
     ExecuteQueryCount,
     ExecuteUpdate,
     ExecuteBatchQuery,
-    ExecuteBatchUpdate,
+    ExecuteBatchUpdate
 
 }
