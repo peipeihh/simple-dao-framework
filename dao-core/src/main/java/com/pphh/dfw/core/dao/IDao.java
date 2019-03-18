@@ -2,11 +2,10 @@ package com.pphh.dfw.core.dao;
 
 import com.pphh.dfw.core.IEntity;
 import com.pphh.dfw.core.IHints;
+import com.pphh.dfw.core.function.DfwFunction;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Please add description here.
@@ -78,13 +77,9 @@ public interface IDao {
 
     //<T extends IEntity> Page<T> queryByPage(T entity, Object pageable);
 
-    int execute(Consumer consumer) throws Exception;
+    int execute(DfwFunction function) throws Exception;
 
-    int execute(Consumer consumer, IHints hints) throws Exception;
-
-    int execute(Function function) throws Exception;
-
-    int execute(Function function, IHints hints) throws Exception;
+    int execute(DfwFunction function, IHints hints) throws Exception;
 
     int run(ISqlBuilder updateSqlBuilder) throws Exception;
 

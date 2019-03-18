@@ -3,14 +3,13 @@ package com.pphh.dfw.transaction;
 import com.pphh.dfw.BaseTest;
 import com.pphh.dfw.Dao;
 import com.pphh.dfw.DaoFactory;
+import com.pphh.dfw.core.function.DfwFunction;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.dao.NoShardTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.function.Consumer;
 
 import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 
@@ -48,7 +47,7 @@ public class TrancOnNoShardTest extends BaseTest {
 
     @Test
     public void testSimpleTransaction() throws Exception {
-        int rt = dao.execute((Consumer) t -> {
+        int rt = dao.execute(() -> {
             try {
                 noShardTest.testQueryByPk();
             } catch (Exception e) {
@@ -61,9 +60,9 @@ public class TrancOnNoShardTest extends BaseTest {
 
     @Test
     public void testTransactionRecurrsive() throws Exception {
-        int rt = dao.execute((Consumer) t -> {
+        int rt = dao.execute(() -> {
             try {
-                transactionWrapper();
+                TrancOnNoShardTest.this.transactionWrapper();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -75,7 +74,7 @@ public class TrancOnNoShardTest extends BaseTest {
 
     private void transactionWrapper() throws Exception {
         noShardTest.testQueryByPk();
-        int rt = dao.execute((Consumer) t -> {
+        int rt = dao.execute(() -> {
             try {
                 noShardTest.testQueryByPk();
             } catch (Exception e) {
@@ -88,7 +87,7 @@ public class TrancOnNoShardTest extends BaseTest {
 
     @Test
     public void testInsert() throws Exception {
-        int rt = dao.execute((Consumer) t -> {
+        int rt = dao.execute(() -> {
             try {
                 noShardTest.testInsert();
             } catch (Exception e) {
@@ -101,7 +100,7 @@ public class TrancOnNoShardTest extends BaseTest {
 
     @Test
     public void testDelete() throws Exception {
-        int rt = dao.execute((Consumer) t -> {
+        int rt = dao.execute(() -> {
             try {
                 noShardTest.testDelete();
             } catch (Exception e) {
@@ -109,6 +108,12 @@ public class TrancOnNoShardTest extends BaseTest {
                 Assert.fail("An exception happened on transaction execute - testDelete.");
             }
         });
+        Assert.assertEquals(0, rt);
+    }
+
+    @Test
+    public void testDeleteWithFuncException() throws Exception {
+        int rt = dao.execute(() -> noShardTest.testDelete());
         Assert.assertEquals(0, rt);
     }
 }

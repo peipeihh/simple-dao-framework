@@ -2,6 +2,7 @@ package com.pphh.dfw.transaction;
 
 import com.pphh.dfw.*;
 import com.pphh.dfw.core.exception.DfwException;
+import com.pphh.dfw.core.function.DfwFunction;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.dao.DbShardTest;
 import org.junit.After;
@@ -9,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.function.Consumer;
 
 import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 
@@ -48,7 +48,7 @@ public class TrancOnDbShardTest extends BaseTest {
 
     @Test
     public void testTrancQuery() throws Exception {
-        int rt = dao.execute((Consumer) t -> {
+        int rt = dao.execute(() -> {
             try {
                 dbShardTest.testQueryByPk();
             } catch (Exception e) {
@@ -66,7 +66,7 @@ public class TrancOnDbShardTest extends BaseTest {
 
     @Test
     public void testTrancInsert() throws Exception {
-        int rt = dao.execute((Consumer) t -> {
+        int rt = dao.execute(() -> {
             try {
                 dbShardTest.testInsert();
             } catch (Exception e) {

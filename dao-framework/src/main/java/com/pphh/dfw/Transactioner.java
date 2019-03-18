@@ -1,13 +1,13 @@
 package com.pphh.dfw;
 
 import com.pphh.dfw.core.exception.DfwException;
+import com.pphh.dfw.core.function.DfwFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  * Please add description here.
@@ -70,8 +70,7 @@ public class Transactioner {
         Transactioner.trancDepth.get().decrementAndGet();
     }
 
-
-    public int execute(Consumer consumer) throws Exception {
+    public int execute(DfwFunction function) throws Exception {
         Boolean trancOn = Transactioner.trancOn.get();
         if (trancOn == null) {
             Transactioner.trancOn.set(Boolean.TRUE);
@@ -82,7 +81,8 @@ public class Transactioner {
         try {
             this.incrementDepth();
 
-            consumer.accept(null);
+            function.accept();
+
             Connection connection = Transactioner.connLocal.get();
             if (connection != null) {
                 connection.commit();
@@ -100,6 +100,7 @@ public class Transactioner {
                     log.info("received an exception when trying rollback the transaction, msg = ", sqlException.getMessage());
                 }
             }
+            throw e;
         } finally {
             this.decrementDepth();
 

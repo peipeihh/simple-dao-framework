@@ -2,11 +2,11 @@ package com.pphh.dfw;
 
 import com.pphh.dfw.core.*;
 import com.pphh.dfw.core.constant.HintEnum;
-import com.pphh.dfw.core.constant.SqlTaskType;
 import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
+import com.pphh.dfw.core.function.DfwFunction;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
 import com.pphh.dfw.core.table.Expression;
@@ -19,13 +19,10 @@ import com.pphh.dfw.table.GenericTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static com.pphh.dfw.core.sqlb.SqlConstant.*;
 
@@ -526,22 +523,12 @@ public class Dao implements IDao {
     }
 
     @Override
-    public int execute(Consumer consumer) throws Exception {
-        return Transactioner.getInstance().execute(consumer);
+    public int execute(DfwFunction function) throws Exception {
+        return Transactioner.getInstance().execute(function);
     }
 
     @Override
-    public int execute(Consumer consumer, IHints hints) throws Exception {
-        return 0;
-    }
-
-    @Override
-    public int execute(Function function) throws Exception {
-        return 0;
-    }
-
-    @Override
-    public int execute(Function function, IHints hints) throws Exception {
+    public int execute(DfwFunction function, IHints hints) throws Exception {
         return 0;
     }
 
