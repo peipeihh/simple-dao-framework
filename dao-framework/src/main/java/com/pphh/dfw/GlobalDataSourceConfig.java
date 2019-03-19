@@ -18,6 +18,7 @@ import java.util.Map;
  */
 public class GlobalDataSourceConfig implements IDataSourceConfig {
     private static IDataSourceConfig instance = new GlobalDataSourceConfig();
+    private DataSourceConfigLoader loader = null;
     private Map<String, LogicDBConfig> logicDBConfigMap;
     private Map<String, PhysicalDBConfig> physicalDBConfigMap;
 
@@ -32,17 +33,18 @@ public class GlobalDataSourceConfig implements IDataSourceConfig {
     public GlobalDataSourceConfig load() throws Exception {
         String location = "local";
 
-        DataSourceConfigLoader loader = null;
-        if (ConfigTypeEnum.REMOTE.name().equalsIgnoreCase(location)) {
-            loader = new RemoteDSConfigLoader();
-        } else if (ConfigTypeEnum.LOCAL.name().equalsIgnoreCase(location)) {
-            loader = new LocalDSConfigLoader();
-        } else {
-            loader = new LocalDSConfigLoader();
-        }
+        if (this.loader == null) {
+            if (ConfigTypeEnum.REMOTE.name().equalsIgnoreCase(location)) {
+                this.loader = new RemoteDSConfigLoader();
+            } else if (ConfigTypeEnum.LOCAL.name().equalsIgnoreCase(location)) {
+                this.loader = new LocalDSConfigLoader();
+            } else {
+                this.loader = new LocalDSConfigLoader();
+            }
 
-        this.logicDBConfigMap = loader.loadLogic();
-        this.physicalDBConfigMap = loader.loadPhysical();
+            this.logicDBConfigMap = this.loader.loadLogic();
+            this.physicalDBConfigMap = this.loader.loadPhysical();
+        }
 
         return this;
     }
