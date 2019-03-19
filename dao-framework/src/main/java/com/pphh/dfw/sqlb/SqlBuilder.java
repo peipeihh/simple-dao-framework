@@ -17,6 +17,7 @@ import com.pphh.dfw.core.table.Expression;
 import com.pphh.dfw.core.table.ITable;
 import com.pphh.dfw.core.table.ITableField;
 import com.pphh.dfw.core.exception.DfwException;
+import com.pphh.dfw.shard.ShardManager;
 import com.pphh.dfw.table.GenericTable;
 
 import java.util.Arrays;
@@ -325,55 +326,9 @@ public class SqlBuilder implements ISqlBuilder {
     }
 
     private String buildOn(String logicDb) throws DfwException {
-        // 加载逻辑数据库配置
-        String tableShard = null;
-        String dbShard = null;
-        IDataSourceConfig dsConfig = null;
-        try {
-            dsConfig = GlobalDataSourceConfig.getInstance().load();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         // 根据逻辑数据库定义，计算分库分表
-        Object dbShardId = hints.getHintValue(HintEnum.DB_SHARD);
-        Object tableShardId = hints.getHintValue(HintEnum.TABLE_SHARD);
-        Object dbShardValue = hints.getHintValue(HintEnum.DB_SHARD_VALUE);
-        Object tableShardValue = hints.getHintValue(HintEnum.TABLE_SHARD_VALUE);
-
-        if (dsConfig != null) {
-            LogicDBConfig logicDBConfig = dsConfig.getLogicDBConfig(logicDb);
-            ShardStrategy strategy = logicDBConfig.getShardStrategy();
-            if (strategy != null) {
-
-                if (logicDBConfig.getDbShardColumn() != null && !logicDBConfig.getDbShardColumn().isEmpty()) {
-                    if (dbShardId != null) {
-                        dbShard = strategy.locateDbShard(dbShardId.toString(), Boolean.FALSE);
-                    } else if (dbShardValue != null) {
-                        dbShard = strategy.locateDbShard(dbShardValue.toString(), Boolean.TRUE);
-                    }
-
-                    if (dbShardId == null && dbShardValue == null) {
-                        throw new DfwException(String.format("This dao requires db shard, but no shard id/value is found to column [%s]. " +
-                                "Please specify shard id/value before building sql.", logicDBConfig.getDbShardColumn()));
-                    }
-                }
-
-                if (logicDBConfig.getTableShardColumn() != null && !logicDBConfig.getTableShardColumn().isEmpty()) {
-                    if (tableShardId != null) {
-                        tableShard = strategy.locateTableShard(tableShardId.toString(), Boolean.FALSE);
-                    } else if (tableShardValue != null) {
-                        tableShard = strategy.locateTableShard(tableShardValue.toString(), Boolean.TRUE);
-                    }
-
-                    if (tableShardId == null && tableShardValue == null) {
-                        throw new DfwException(String.format("This dao requires table shard, but no shard id/value is found to column [%s]. " +
-                                "Please specify shard id/value before building sql.", logicDBConfig.getTableShardColumn()));
-                    }
-                }
-
-            }
-        }
+        String tableShard = ShardManager.getTableShardByHints(logicDb, this.hints);
+        String dbShard = ShardManager.getDbShardByHints(logicDb, this.hints);
 
         // 切换分库分表之后的sql拼接字段
         List<ISqlSegement> shardSqlSegements = new LinkedList<>();

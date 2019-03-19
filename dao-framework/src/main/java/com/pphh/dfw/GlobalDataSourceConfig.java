@@ -7,6 +7,8 @@ import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
 import com.pphh.dfw.core.ds.PhysicalDBConfig;
 import com.pphh.dfw.constant.ConfigTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -17,6 +19,9 @@ import java.util.Map;
  * @date 9/21/2018
  */
 public class GlobalDataSourceConfig implements IDataSourceConfig {
+
+    private final static Logger log = LoggerFactory.getLogger(GlobalDataSourceConfig.class);
+
     private static IDataSourceConfig instance = new GlobalDataSourceConfig();
     private DataSourceConfigLoader loader = null;
     private Map<String, LogicDBConfig> logicDBConfigMap;
@@ -30,7 +35,7 @@ public class GlobalDataSourceConfig implements IDataSourceConfig {
     }
 
     @Override
-    public GlobalDataSourceConfig load() throws Exception {
+    public GlobalDataSourceConfig load() {
         String location = "local";
 
         if (this.loader == null) {
@@ -42,8 +47,12 @@ public class GlobalDataSourceConfig implements IDataSourceConfig {
                 this.loader = new LocalDSConfigLoader();
             }
 
-            this.logicDBConfigMap = this.loader.loadLogic();
-            this.physicalDBConfigMap = this.loader.loadPhysical();
+            try {
+                this.logicDBConfigMap = this.loader.loadLogic();
+                this.physicalDBConfigMap = this.loader.loadPhysical();
+            } catch (Exception e) {
+                log.error("failed to load logic and physical db configuration, msg = {}", e.getMessage());
+            }
         }
 
         return this;
@@ -51,12 +60,20 @@ public class GlobalDataSourceConfig implements IDataSourceConfig {
 
     @Override
     public LogicDBConfig getLogicDBConfig(String id) {
-        return logicDBConfigMap.get(id);
+        LogicDBConfig dbConfig = null;
+        if (this.logicDBConfigMap != null && id != null) {
+            dbConfig = logicDBConfigMap.get(id);
+        }
+        return dbConfig;
     }
 
     @Override
     public PhysicalDBConfig getPhysicalDBConfigMap(String id) {
-        return physicalDBConfigMap.get(id);
+        PhysicalDBConfig dbConfig = null;
+        if (this.physicalDBConfigMap != null && id != null) {
+            dbConfig = physicalDBConfigMap.get(id);
+        }
+        return dbConfig;
     }
 
 }
