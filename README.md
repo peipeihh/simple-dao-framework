@@ -4,7 +4,7 @@
 
 本项目以尽量简洁的方式实现一个数据访问框架实现，包括dao/orm/sqlbuilder/jdbc/分库分表等核心技术栈。框架功能包括，
 
-- dao/entity 抽象逻辑数据库，实现数据实体的基本增删改查、批量和事务操作（注：事务功能待实现），透明分库分表
+- dao/entity 抽象逻辑数据库，实现数据实体的基本增删改查、批量和事务操作，透明分库分表
 - sqlbuilder 动态的sqlbuilder，支持灵活的sql语句生成
 - orm 兼容JPA，并为sqlbuilder提供字段定义，方便使用sqlbuilder构建
 - jdbc 实现分库，对接数据库连接池。
