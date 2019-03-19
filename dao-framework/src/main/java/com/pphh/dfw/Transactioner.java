@@ -33,30 +33,51 @@ public class Transactioner {
         return ourInstance;
     }
 
+    public Boolean isTransactionOn() {
+        Boolean trancOn = Transactioner.trancOn.get();
+        return trancOn != null && trancOn;
+    }
+
+    public Connection initConnection(String dbName) throws Exception {
+        log.info("try to initialize a connection for current transaction, dbName = " + dbName);
+        if (dbName == null) {
+            throw new DfwException("The db name could not be null.");
+        }
+
+        Connection connection = Transactioner.connLocal.get();
+        if (connection == null) {
+            Transactioner.trancDbName.set(dbName);
+            connection = DataSourceManager.getInstance().getConnection(dbName);
+            connection.setAutoCommit(false);
+            Transactioner.connLocal.set(connection);
+            log.info("the connection has been initialized for current transaction, dbName = " + dbName);
+        } else {
+            throw new DfwException("An existing db connection has been set ready, dbName = " + Transactioner.trancDbName.get());
+        }
+
+        return connection;
+    }
+
     public Connection getConnection(String dbName) throws Exception {
         Boolean trancOn = Transactioner.trancOn.get();
 
         Connection connection = null;
         if (trancOn != null && trancOn) {
-
-            connection = Transactioner.connLocal.get();
-            if (connection != null) {
-                String existingDbName = Transactioner.trancDbName.get();
-                if (existingDbName == null) {
-                    throw new DfwException("The db name is not saved for existing connection");
-                }
-
-                if (existingDbName != null && !existingDbName.equals(dbName)) {
-                    String msg = String.format("The transaction could not be applied on cross database, [%s] conflicts with [%s]", this.trancDbName.get(), dbName);
+            String existingDbName = Transactioner.trancDbName.get();
+            if (existingDbName != null) {
+                if (!existingDbName.equals(dbName)) {
+                    String msg = String.format("The transaction could not be applied on cross database, [%s] conflicts with [%s]", existingDbName, dbName);
+                    log.error(msg);
                     throw new DfwException(msg);
                 }
-            } else {
-                Transactioner.trancDbName.set(dbName);
-                connection = DataSourceManager.getInstance().getConnection(dbName);
-                connection.setAutoCommit(false);
-                Transactioner.connLocal.set(connection);
-            }
 
+                connection = Transactioner.connLocal.get();
+                if (connection == null) {
+                    log.error("The db connection wasn't initialized correctly, dbName = " + dbName);
+                }
+            } else {
+                log.info("The db connection has not been initialized for current transaction, dbName = " + dbName);
+            }
         }
 
         return connection;
@@ -68,6 +89,20 @@ public class Transactioner {
 
     private void decrementDepth() {
         Transactioner.trancDepth.get().decrementAndGet();
+    }
+
+    public int execute(DfwFunction function, String dbName) throws Exception {
+        Boolean trancOn = Transactioner.trancOn.get();
+        if (trancOn == null) {
+            Transactioner.trancOn.set(Boolean.TRUE);
+            Transactioner.trancDepth.set(new AtomicInteger(0));
+        }
+
+        if (dbName != null) {
+            initConnection(dbName);
+        }
+
+        return execute(function);
     }
 
     public int execute(DfwFunction function) throws Exception {
@@ -87,8 +122,8 @@ public class Transactioner {
             if (connection != null) {
                 connection.commit();
             }
-        } catch (Exception e) {
             rt = 1;
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("received an exception when executing the transaction, msg = ", e.getMessage());
             Connection connection = Transactioner.connLocal.get();

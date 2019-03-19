@@ -1,6 +1,7 @@
 package com.pphh.dfw.transaction;
 
 import com.pphh.dfw.*;
+import com.pphh.dfw.core.IHints;
 import com.pphh.dfw.core.exception.DfwException;
 import com.pphh.dfw.core.function.DfwFunction;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
@@ -10,6 +11,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+
+import java.util.List;
 
 import static com.pphh.dfw.sqlb.SqlStarter.sqlBuilder;
 
@@ -43,7 +46,6 @@ public class TrancOnDbShardTest extends BaseTest {
 
     @After
     public void tearDownCase() {
-
     }
 
     @Test
@@ -61,7 +63,7 @@ public class TrancOnDbShardTest extends BaseTest {
                 }
             }
         });
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
     }
 
     @Test
@@ -79,7 +81,78 @@ public class TrancOnDbShardTest extends BaseTest {
                 }
             }
         });
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
     }
 
+    @Test
+    public void testTrancInsertByDbIdHint() throws Exception {
+        IHints hints = new Hints().inDbShard(0);
+        int rt = dao.execute(() -> this.testInsertOnSameShard(0), hints);
+        Assert.assertEquals(1, rt);
+    }
+
+    @Test
+    public void testTrancInsertByDbValueHint() throws Exception {
+        IHints hints = new Hints().dbShardValue(1);
+        int rt = dao.execute(() -> this.testInsertOnSameShard(1), hints);
+        Assert.assertEquals(1, rt);
+    }
+
+    @Test
+    public void testTrancInsertByDbIdHintByCrossError() throws Exception {
+        IHints hints = new Hints().inDbShard(0);
+        int rt = dao.execute(() -> {
+            try {
+                this.testInsertOnSameShard(1);
+            } catch (Exception e) {
+                if (!(e instanceof DfwException)) {
+                    Assert.fail();
+                    e.printStackTrace();
+                } else {
+                    Assert.assertTrue("check the error message",
+                            e.getMessage().contains("The transaction could not be applied on cross database"));
+                }
+            }
+        }, hints);
+        Assert.assertEquals(1, rt);
+    }
+
+    @Test
+    public void testTrancInsertByDbValueHintByCrossError() throws Exception {
+        IHints hints = new Hints().dbShardValue(1);
+        int rt = dao.execute(() -> {
+            try {
+                this.testInsertOnSameShard(0);
+            } catch (Exception e) {
+                if (!(e instanceof DfwException)) {
+                    Assert.fail();
+                    e.printStackTrace();
+                } else {
+                    Assert.assertTrue("check the error message",
+                            e.getMessage().contains("The transaction could not be applied on cross database"));
+                }
+            }
+        }, hints);
+        Assert.assertEquals(1, rt);
+    }
+
+    public void testInsertOnSameShard(int dbShard) throws Exception {
+        for (int i = 100; i < DB_MOD * 3 + 100; i++) {
+
+            if (i % DB_MOD == dbShard) {
+                OrderEntity order = new OrderEntity();
+                order.setId(i);
+                order.setCityID(i);
+                order.setCountryID(i * 20 + 1);
+                int result = dao.insert(order);
+                Assert.assertEquals(1, result);
+                List<OrderEntity> entities = dao.queryBySample(order);
+                Assert.assertNotNull(entities);
+                Assert.assertEquals(1, entities.size());
+                Assert.assertEquals(i, entities.get(0).getCityID().intValue());
+                Assert.assertEquals(i * 20 + 1, entities.get(0).getCountryID().intValue());
+            }
+
+        }
+    }
 }

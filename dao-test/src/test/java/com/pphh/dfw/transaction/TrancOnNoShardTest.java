@@ -3,7 +3,6 @@ package com.pphh.dfw.transaction;
 import com.pphh.dfw.BaseTest;
 import com.pphh.dfw.Dao;
 import com.pphh.dfw.DaoFactory;
-import com.pphh.dfw.core.function.DfwFunction;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.dao.NoShardTest;
 import org.junit.After;
@@ -55,7 +54,7 @@ public class TrancOnNoShardTest extends BaseTest {
                 Assert.fail("An exception happened on query by pk.");
             }
         });
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
     }
 
     @Test
@@ -67,7 +66,7 @@ public class TrancOnNoShardTest extends BaseTest {
                 e.printStackTrace();
             }
         });
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
 
         noShardTest.testQueryByPk();
     }
@@ -82,7 +81,7 @@ public class TrancOnNoShardTest extends BaseTest {
                 Assert.fail("An exception happened on query by pk in the transaction wrapper.");
             }
         });
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
     }
 
     @Test
@@ -95,7 +94,7 @@ public class TrancOnNoShardTest extends BaseTest {
                 Assert.fail("An exception happened on transaction execute - testInsert.");
             }
         });
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
     }
 
     @Test
@@ -108,12 +107,12 @@ public class TrancOnNoShardTest extends BaseTest {
                 Assert.fail("An exception happened on transaction execute - testDelete.");
             }
         });
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
     }
 
     @Test
     public void testDeleteWithFuncException() throws Exception {
         int rt = dao.execute(() -> noShardTest.testDelete());
-        Assert.assertEquals(0, rt);
+        Assert.assertEquals(1, rt);
     }
 }

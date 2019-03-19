@@ -79,7 +79,7 @@ public interface IDao {
 
     int execute(DfwFunction function) throws Exception;
 
-    int execute(DfwFunction function, IHints hints) throws Exception;
+    int execute(DfwFunction function, IHints dbHints) throws Exception;
 
     int run(ISqlBuilder updateSqlBuilder) throws Exception;
 

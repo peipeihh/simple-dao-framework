@@ -33,13 +33,15 @@ public class Transformer implements ITransformer {
     public <T> TaskResult<T> run(Task task) throws Exception {
         String dbName = task.getDbName();
 
-        Boolean isTrancOn;
-        Connection connection = Transactioner.getInstance().getConnection(dbName);
-        if (connection != null) {
-            isTrancOn = Boolean.TRUE;
+        Boolean isTrancOn = Transactioner.getInstance().isTransactionOn();
+        Connection connection = null;
+        if (isTrancOn) {
+            connection = Transactioner.getInstance().getConnection(dbName);
+            if (connection == null) {
+                connection = Transactioner.getInstance().initConnection(dbName);
+            }
         } else {
             connection = DataSourceManager.getInstance().getConnection(dbName);
-            isTrancOn = Boolean.FALSE;
         }
 
         TaskResult result = new TaskResult();

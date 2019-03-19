@@ -6,6 +6,7 @@ import com.pphh.dfw.core.dao.IBatchSqlBuilder;
 import com.pphh.dfw.core.dao.IDao;
 import com.pphh.dfw.core.ds.IDataSourceConfig;
 import com.pphh.dfw.core.ds.LogicDBConfig;
+import com.pphh.dfw.core.exception.DfwException;
 import com.pphh.dfw.core.function.DfwFunction;
 import com.pphh.dfw.core.sqlb.ISqlBuilder;
 import com.pphh.dfw.core.sqlb.ISqlSegement;
@@ -528,8 +529,39 @@ public class Dao implements IDao {
     }
 
     @Override
-    public int execute(DfwFunction function, IHints hints) throws Exception {
-        return 0;
+    public int execute(DfwFunction function, IHints dbHints) throws Exception {
+        // 加载逻辑数据库配置
+        String dbName = null;
+
+        IDataSourceConfig dsConfig = null;
+        try {
+            dsConfig = GlobalDataSourceConfig.getInstance().load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Object dbShardId = dbHints.getHintValue(HintEnum.DB_SHARD);
+        Object dbShardValue = dbHints.getHintValue(HintEnum.DB_SHARD_VALUE);
+        if (dsConfig != null) {
+            LogicDBConfig logicDBConfig = dsConfig.getLogicDBConfig(this.logicDbName);
+            ShardStrategy strategy = logicDBConfig.getShardStrategy();
+            if (strategy != null) {
+                if (logicDBConfig.getDbShardColumn() != null && !logicDBConfig.getDbShardColumn().isEmpty()) {
+                    String dbShard = null;
+                    if (dbShardId != null) {
+                        dbShard = strategy.locateDbShard(dbShardId.toString(), Boolean.FALSE);
+                    } else if (dbShardValue != null) {
+                        dbShard = strategy.locateDbShard(dbShardValue.toString(), Boolean.TRUE);
+                    }
+
+                    if (dbShard != null) {
+                        dbName = logicDBConfig.getPhysicalDbName(dbShard);
+                    }
+                }
+            }
+        }
+
+        return Transactioner.getInstance().execute(function, dbName);
     }
 
     @Override
@@ -571,7 +603,7 @@ public class Dao implements IDao {
 
         // 根据逻辑数据库定义，获取分库分表字段
         if (dsConfig != null) {
-            LogicDBConfig logicDBConfig = dsConfig.getLogicDBConfig(logicDbName);
+            LogicDBConfig logicDBConfig = dsConfig.getLogicDBConfig(this.logicDbName);
             hints.sqlDialect(logicDBConfig.getDefaultDriver());
 
             ShardStrategy strategy = logicDBConfig.getShardStrategy();
