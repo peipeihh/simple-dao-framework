@@ -130,17 +130,57 @@ public class Transformer implements ITransformer {
     private void setFieldValue(Field f, String fieldDef, Type fieldType, Object target, ResultSet rs) throws SQLException, IllegalAccessException {
         f.setAccessible(true);
         switch (fieldType.getTypeName()) {
-            case "java.lang.Integer":
-                f.set(target, rs.getInt(fieldDef));
-                break;
             case "java.lang.String":
                 f.set(target, rs.getString(fieldDef));
+                break;
+            case "java.lang.Short":
+                f.set(target, rs.getShort(fieldDef));
+                break;
+            case "java.lang.Integer":
+                f.set(target, rs.getInt(fieldDef));
                 break;
             case "java.lang.Long":
                 f.set(target, rs.getLong(fieldDef));
                 break;
+            case "java.lang.Float":
+                f.set(target, rs.getFloat(fieldDef));
+                break;
+            case "java.lang.Double":
+                f.set(target, rs.getDouble(fieldDef));
+                break;
             case "java.sql.Date":
                 f.set(target, rs.getDate(fieldDef));
+                break;
+            case "java.sql.Timestamp":
+                f.set(target, rs.getTimestamp(fieldDef));
+                break;
+            case "java.sql.Time":
+                f.set(target, rs.getTime(fieldDef));
+                break;
+            case "java.math.BigDecimal":
+                f.set(target, rs.getBigDecimal(fieldDef));
+                break;
+            case "java.sql.Clob":
+                f.set(target, rs.getClob(fieldDef));
+                break;
+            case "java.sql.Blob":
+                f.set(target, rs.getBlob(fieldDef));
+                break;
+            case "java.net.URL":
+                f.set(target, rs.getURL(fieldDef));
+                break;
+            case "java.lang.Byte":
+                f.set(target, rs.getByte(fieldDef));
+                break;
+            case "java.lang.Byte[]":
+                f.set(target, rs.getBytes(fieldDef));
+                break;
+            case "java.lang.Array":
+                f.set(target, rs.getArray(fieldDef));
+                break;
+            case "java.lang.Object":
+                f.set(target, rs.getObject(fieldDef));
+                break;
             default:
         }
     }

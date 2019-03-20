@@ -147,3 +147,49 @@ CREATE TABLE IF NOT EXISTS `database1`.`order_2` (
   `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`))
   ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT='订单';
+
+
+-- -----------------------------------------------------
+-- Table `database1`.`full_type`
+-- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `database1`.`full_type_mysql`;
+
+CREATE TABLE IF NOT EXISTS `database1`.`full_type_mysql` (
+  `id` INT NOT NULL COMMENT '整型ID',
+  `medium_int` MEDIUMINT NULL COMMENT 'medium整型',
+  `integer` INTEGER NULL COMMENT '整型',
+  `tiny_int` TINYINT NULL COMMENT 'tiny整型',
+  `small_int` SMALLINT NULL COMMENT 'small整型',
+  `big_int` BIGINT NULL COMMENT 'big整型',
+  `float` FLOAT NULL COMMENT '浮点型',
+  `double` DOUBLE NULL COMMENT '双精度浮点型',
+  `numric` NUMERIC NULL COMMENT '数值型',
+  `decimal` DECIMAL NULL COMMENT 'decimal',
+  `char` CHAR NULL COMMENT '字符串',
+  `varchar_45` VARCHAR(45) NULL COMMENT '变长字符串',
+  `tiny_blob` TINYBLOB NULL COMMENT 'tiny_blob',
+  `blob` BLOB NULL COMMENT 'blob',
+  `long_blob` LONGBLOB NULL COMMENT 'long_blob',
+  `tiny_text` TINYTEXT NULL COMMENT 'tiny_text',
+  `text` TEXT NULL COMMENT 'text',
+  `medium_text` MEDIUMTEXT NULL COMMENT 'medium_text',
+  `long_text` LONGTEXT NULL COMMENT 'long_text',
+  `date` DATE NULL COMMENT 'DATE',
+  `year` YEAR NULL COMMENT 'YEAR',
+  `time` TIME NULL COMMENT 'TIME',
+  `datetime` DATETIME NULL COMMENT 'DATETIME',
+  `timestamp` TIMESTAMP NULL COMMENT 'timestamp',
+  `update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update',
+  PRIMARY KEY (`id`))
+  ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT='数据库字段类型测试';
+
+INSERT INTO `database1`.`full_type_mysql`
+(`id`, `medium_int`, `integer`, `tiny_int`, `small_int`, `big_int`, `float`, `double`, `numric`, `decimal`, `char`,
+ `varchar_45`, `tiny_blob`, `blob`, `long_blob`, `tiny_text`, `text`, `medium_text`,`long_text`, `date`, `year`, `time`,
+`datetime`, `timestamp`)
+VALUES
+  (1, 2, 3, 4, 5, 6, 7.0, 8.0, 9, 10, '1', '12','13', '14', '15', '16', '17', '18','19',
+                                           '2019-01-01', '2019', '', '2019-01-01 00:00:00', NULL ),
+  (2, 2, 3, 4, 5, 6, 7.0, 8.0, 9, 10, '1', '12','13', '14', '15', '16', '17', '18', '19',
+                                           '2019-01-01', '2019', '', '2019-01-01 00:00:00', '2019-01-01 00:00:00');
