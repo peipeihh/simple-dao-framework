@@ -12,6 +12,7 @@
         <module>dao-core</module>
         <module>dao-test</module>
         <module>dao-framework</module>
+        <module>dao-tool</module>
     </modules>
 
     <properties>
