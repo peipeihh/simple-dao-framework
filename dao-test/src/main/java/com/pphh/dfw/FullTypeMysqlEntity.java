@@ -24,42 +24,42 @@ public class FullTypeMysqlEntity implements IEntity {
     private Integer id;
 
     @Column(name = "medium_int")
-    private Integer mediumIntVal;
+    private Integer mediumInt;
 
-    @Column(name = "integer")
+    @Column(name = "integer_val")
     private Integer integerVal;
 
     @Column(name = "tiny_int")
-    private Byte tinyIntVal;
+    private Byte tinyInt;
 
     @Column(name = "small_int")
-    private Short smallIntVal;
+    private Short smallInt;
 
     @Column(name = "big_int")
-    private Long bigIntVal;
+    private Long bigInt;
 
-    @Column(name = "float")
+    @Column(name = "float_val")
     private Double floatVal;
 
-    @Column(name = "double")
+    @Column(name = "double_val")
     private Double doubleVal;
 
-    @Column(name = "numric")
+    @Column(name = "numric_val")
     private BigDecimal numricVal;
 
-    @Column(name = "decimal")
+    @Column(name = "decimal_val")
     private BigDecimal decimalVal;
 
-    @Column(name = "char")
+    @Column(name = "char_val")
     private String charVal;
 
     @Column(name = "varchar_45")
-    private String varchar45Val;
+    private String varchar45;
 
     @Column(name = "tiny_blob")
     private Blob tinyBlobVal;
 
-    @Column(name = "blob")
+    @Column(name = "blob_val")
     private Blob blobVal;
 
     @Column(name = "long_blob")
@@ -68,31 +68,31 @@ public class FullTypeMysqlEntity implements IEntity {
     @Column(name = "tiny_text")
     private String tinyTextVal;
 
-    @Column(name = "text")
+    @Column(name = "text_val")
     private String textVal;
 
     @Column(name = "medium_text")
-    private String mediumTextVal;
+    private String mediumText;
 
     @Column(name = "long_text")
-    private String longTextVal;
+    private String longText;
 
-    @Column(name = "date")
+    @Column(name = "date_val")
     private Date dateVal;
 
-    @Column(name = "year")
+    @Column(name = "year_val")
     private Date yearVal;
 
-    @Column(name = "time")
+    @Column(name = "time_val")
     private Time timeVal;
 
-    @Column(name = "datetime")
+    @Column(name = "datetime_val")
     private Timestamp datetimeVal;
 
-    @Column(name = "timestamp")
+    @Column(name = "timestamp_val")
     private Timestamp timestampVal;
 
-    @Column(name = "update")
+    @Column(name = "update_time")
     private Timestamp updateTime;
 
     public Integer getId() {
@@ -103,12 +103,12 @@ public class FullTypeMysqlEntity implements IEntity {
         this.id = id;
     }
 
-    public Integer getMediumIntVal() {
-        return mediumIntVal;
+    public Integer getMediumInt() {
+        return mediumInt;
     }
 
-    public void setMediumIntVal(Integer mediumIntVal) {
-        this.mediumIntVal = mediumIntVal;
+    public void setMediumInt(Integer mediumInt) {
+        this.mediumInt = mediumInt;
     }
 
     public Integer getIntegerVal() {
@@ -119,28 +119,28 @@ public class FullTypeMysqlEntity implements IEntity {
         this.integerVal = integerVal;
     }
 
-    public Byte getTinyIntVal() {
-        return tinyIntVal;
+    public Byte getTinyInt() {
+        return tinyInt;
     }
 
-    public void setTinyIntVal(Byte tinyIntVal) {
-        this.tinyIntVal = tinyIntVal;
+    public void setTinyInt(Byte tinyInt) {
+        this.tinyInt = tinyInt;
     }
 
-    public Short getSmallIntVal() {
-        return smallIntVal;
+    public Short getSmallInt() {
+        return smallInt;
     }
 
-    public void setSmallIntVal(Short smallIntVal) {
-        this.smallIntVal = smallIntVal;
+    public void setSmallInt(Short smallInt) {
+        this.smallInt = smallInt;
     }
 
-    public Long getBigIntVal() {
-        return bigIntVal;
+    public Long getBigInt() {
+        return bigInt;
     }
 
-    public void setBigIntVal(Long bigIntVal) {
-        this.bigIntVal = bigIntVal;
+    public void setBigInt(Long bigInt) {
+        this.bigInt = bigInt;
     }
 
     public Double getFloatVal() {
@@ -183,12 +183,12 @@ public class FullTypeMysqlEntity implements IEntity {
         this.charVal = charVal;
     }
 
-    public String getVarchar45Val() {
-        return varchar45Val;
+    public String getVarchar45() {
+        return varchar45;
     }
 
-    public void setVarchar45Val(String varchar45Val) {
-        this.varchar45Val = varchar45Val;
+    public void setVarchar45(String varchar45) {
+        this.varchar45 = varchar45;
     }
 
     public Blob getTinyBlobVal() {
@@ -231,20 +231,20 @@ public class FullTypeMysqlEntity implements IEntity {
         this.textVal = textVal;
     }
 
-    public String getMediumTextVal() {
-        return mediumTextVal;
+    public String getMediumText() {
+        return mediumText;
     }
 
-    public void setMediumTextVal(String mediumTextVal) {
-        this.mediumTextVal = mediumTextVal;
+    public void setMediumText(String mediumText) {
+        this.mediumText = mediumText;
     }
 
-    public String getLongTextVal() {
-        return longTextVal;
+    public String getLongText() {
+        return longText;
     }
 
-    public void setLongTextVal(String longTextVal) {
-        this.longTextVal = longTextVal;
+    public void setLongText(String longText) {
+        this.longText = longText;
     }
 
     public Date getDateVal() {

@@ -14,34 +14,35 @@ public class FullTypeMysqlTable extends AbstractTable {
     public static final OrderTable ORDER = new OrderTable();
 
     public final TableField id = new TableField("id");
-    public final TableField integer = new TableField("integer");
+    public final TableField mediumInt = new TableField("medium_int");
+    public final TableField integerVal = new TableField("integer_val");
     public final TableField tinyInt = new TableField("tiny_int");
     public final TableField smallInt = new TableField("small_int");
     public final TableField bigInt = new TableField("big_int");
-    public final TableField floatVal = new TableField("float");
-    public final TableField doubleVal = new TableField("double");
-    public final TableField numricVal = new TableField("numric");
-    public final TableField decimalVal = new TableField("decimal");
-    public final TableField charVal = new TableField("char");
-    public final TableField varchar45Val = new TableField("varchar_45");
+    public final TableField floatVal = new TableField("float_val");
+    public final TableField doubleVal = new TableField("double_val");
+    public final TableField numricVal = new TableField("numric_val");
+    public final TableField decimalVal = new TableField("decimal_val");
+    public final TableField charVal = new TableField("char_val");
+    public final TableField varchar45 = new TableField("varchar_45");
     public final TableField tinyBlob = new TableField("tiny_blob");
-    public final TableField blobVal = new TableField("blob");
+    public final TableField blobVal = new TableField("blob_val");
     public final TableField longBlob = new TableField("long_blob");
     public final TableField tinyText = new TableField("tiny_text");
-    public final TableField textVal = new TableField("text");
+    public final TableField textVal = new TableField("text_val");
     public final TableField mediumText = new TableField("medium_text");
     public final TableField longText = new TableField("long_text");
-    public final TableField dateVal = new TableField("date");
-    public final TableField yearVal = new TableField("year");
-    public final TableField timeVal = new TableField("time");
-    public final TableField datetimeVal = new TableField("datetime");
-    public final TableField timestampVal = new TableField("timestamp");
-    public final TableField updateVal = new TableField("update");
+    public final TableField dateVal = new TableField("date_val");
+    public final TableField yearVal = new TableField("year_val");
+    public final TableField timeVal = new TableField("time_val");
+    public final TableField datetimeVal = new TableField("datetime_val");
+    public final TableField timestampVal = new TableField("timestamp_val");
+    public final TableField updateTime = new TableField("update_time");
 
     public FullTypeMysqlTable() {
         super("full_type_mysql");
         this.insertFields(id);
-        this.insertFields(integer);
+        this.insertFields(integerVal);
         this.insertFields(tinyInt);
         this.insertFields(smallInt);
         this.insertFields(bigInt);
@@ -50,7 +51,7 @@ public class FullTypeMysqlTable extends AbstractTable {
         this.insertFields(numricVal);
         this.insertFields(decimalVal);
         this.insertFields(charVal);
-        this.insertFields(varchar45Val);
+        this.insertFields(varchar45);
         this.insertFields(tinyBlob);
         this.insertFields(blobVal);
         this.insertFields(longBlob);
@@ -63,7 +64,7 @@ public class FullTypeMysqlTable extends AbstractTable {
         this.insertFields(timeVal);
         this.insertFields(datetimeVal);
         this.insertFields(timestampVal);
-        this.insertFields(updateVal);
+        this.insertFields(updateTime);
         this.setPkField(id);
     }
 
