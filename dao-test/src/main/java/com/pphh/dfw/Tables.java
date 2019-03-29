@@ -10,5 +10,6 @@ package com.pphh.dfw;
 public class Tables {
 
     public static final OrderTable ORDER = OrderTable.ORDER;
+    public static final FullTypeMysqlTable FULL_TYPE_MYSQL = FullTypeMysqlTable.FULL_TYPE_MYSQL;
 
 }

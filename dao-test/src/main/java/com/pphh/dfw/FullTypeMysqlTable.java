@@ -11,7 +11,7 @@ import com.pphh.dfw.table.TableField;
  */
 public class FullTypeMysqlTable extends AbstractTable {
 
-    public static final OrderTable ORDER = new OrderTable();
+    public static final FullTypeMysqlTable FULL_TYPE_MYSQL = new FullTypeMysqlTable();
 
     public final TableField id = new TableField("id");
     public final TableField mediumInt = new TableField("medium_int");
@@ -42,6 +42,7 @@ public class FullTypeMysqlTable extends AbstractTable {
     public FullTypeMysqlTable() {
         super("full_type_mysql");
         this.insertFields(id);
+        this.insertFields(mediumInt);
         this.insertFields(integerVal);
         this.insertFields(tinyInt);
         this.insertFields(smallInt);
