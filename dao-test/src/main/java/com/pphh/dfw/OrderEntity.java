@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.sql.Date;
 
 /**
- * Please add description here.
+ * a table entity definition which is used to map table columns to java entities
  *
  * @author huangyinhuang
  * @date 9/27/2018
@@ -15,8 +15,8 @@ import java.sql.Date;
 public class OrderEntity implements IEntity {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private Integer id;
 
     @Column(name = "name")

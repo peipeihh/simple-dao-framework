@@ -19,8 +19,8 @@ import java.sql.Timestamp;
 public class FullTypeMysqlEntity implements IEntity {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private Integer id;
 
     @Column(name = "medium_int")

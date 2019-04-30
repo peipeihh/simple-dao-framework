@@ -7,7 +7,7 @@ import com.pphh.dfw.table.TableField;
 
 
 /**
-* a table definition which is useful to build sql with SqlBuilder
+* a table definition which is used to build sql with SqlBuilder
 *
 * @author ${author}
 * @date ${date}
@@ -16,18 +16,18 @@ public class ${table_cap}Table extends AbstractTable {
 
     public static final ${table_cap}Table ${table?upper_case} = new ${table_cap}Table();
 
-    <#list ["id", "name", "city_id", "country_id"] as x>
+    <#list table_fields as x>
     public final TableField ${x} = new TableField("${x}");
     </#list>
 
     public ${table_cap}Table() {
         super("order");
 
-        <#list ["id", "name", "city_id", "country_id"] as x>
+        <#list table_fields as x>
         this.insertFields(${x});
         </#list>
 
-        this.setPkField(id);
+        this.setPkField(${table_fields_pk});
     }
 
 }

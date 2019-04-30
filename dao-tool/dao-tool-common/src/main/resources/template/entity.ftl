@@ -28,7 +28,7 @@ import javax.persistence.*;
 import java.sql.Date;
 
 /**
-* Please add description here.
+* a table entity definition which is used to map table columns to java entities
 *
 * @author ${author}
 * @date ${date}
@@ -36,17 +36,22 @@ import java.sql.Date;
 @Table(name = "${table}")
 public class ${table_cap}Entity implements IEntity {
 
-    <#list ["id", "name", "city_id", "country_id"] as x>
+    <#list table_fields as x>
+    <#if x == table_fields_pk>
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    </#if>
     @Column(name = "${x}")
-    private String ${dashedToCamel(x)?uncap_first};
+    private ${table_field_type_map[x]} ${dashedToCamel(x)?uncap_first};
+
     </#list>
 
-    <#list ["id", "name", "city_id", "country_id"] as x>
-    public String get${dashedToCamel(x)}() {
+    <#list table_fields as x>
+    public ${table_field_type_map[x]} get${dashedToCamel(x)}() {
         return ${dashedToCamel(x)?uncap_first};
     }
 
-    public void set${dashedToCamel(x)}(Integer ${dashedToCamel(x)?uncap_first}) {
+    public void set${dashedToCamel(x)}(${table_field_type_map[x]} ${dashedToCamel(x)?uncap_first}) {
         this.${dashedToCamel(x)?uncap_first} = ${dashedToCamel(x)?uncap_first};
     }
 

@@ -7,7 +7,11 @@ import freemarker.template.TemplateExceptionHandler;
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,9 +45,28 @@ public class CodeGenUtil {
 
         /* Create a data-model */
         Map table = new HashMap();
-        table.put("author", "michael");
-        table.put("date", "2019-03-29");
+        table.put("author", "pphh");
         table.put("table", "order");
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        table.put("date", df.format(LocalDateTime.now()));
+
+        List tableFields = new ArrayList();
+        tableFields.add("id");
+        tableFields.add("name");
+        tableFields.add("city_id");
+        tableFields.add("country_id");
+        tableFields.add("update_time");
+        table.put("table_fields", tableFields);
+
+        table.put("table_fields_pk", "id");
+
+        Map tableFieldsType = new HashMap();
+        tableFieldsType.put("id", "Integer");
+        tableFieldsType.put("name", "String");
+        tableFieldsType.put("city_id", "Integer");
+        tableFieldsType.put("country_id", "Integer");
+        tableFieldsType.put("update_time", "Date");
+        table.put("table_field_type_map", tableFieldsType);
 
         Writer out = new OutputStreamWriter(System.out);
         /* Get the template (uses cache internally) */

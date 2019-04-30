@@ -5,7 +5,7 @@ import com.pphh.dfw.table.TableField;
 
 
 /**
- * a table definition which is useful to build sql with SqlBuilder
+ * a table definition which is used to build sql with SqlBuilder
  *
  * @author huangyinhuang
  * @date 9/27/2018
