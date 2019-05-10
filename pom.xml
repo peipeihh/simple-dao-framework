@@ -21,6 +21,7 @@
         <java.version>1.8</java.version>
         <springboot.version>1.5.8.RELEASE</springboot.version>
         <swagger.version>2.7.0</swagger.version>
+        <slf4j.version>1.7.26</slf4j.version>
     </properties>
 
     <parent>

@@ -1,6 +1,16 @@
-<#assign table_cap = table?cap_first>
+<#function dashedToCamel(s)>
+    <#return s
+    ?replace('(^_+)|(_+$)', '', 'r')
+    ?replace('\\_+(\\w)?', ' $1', 'r')
+    ?replace('([A-Z])', ' $1', 'r')
+    ?capitalize
+    ?replace(' ' , '')
+    >
+</#function>
+<#assign table_camel = dashedToCamel(table)>
+<#assign table_cap = table_camel?cap_first>
 <#assign table_upper = table?upper_case>
-package com.pphh.dfw.table;
+package com.pphh.dfw;
 
 import com.pphh.dfw.table.AbstractTable;
 import com.pphh.dfw.table.TableField;
@@ -27,7 +37,9 @@ public class ${table_cap}Table extends AbstractTable {
         this.insertFields(${x});
         </#list>
 
+        <#if table_fields_pk??>
         this.setPkField(${table_fields_pk});
+        </#if>
     }
 
 }

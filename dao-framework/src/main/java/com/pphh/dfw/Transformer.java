@@ -130,6 +130,9 @@ public class Transformer implements ITransformer {
     private void setFieldValue(Field f, String fieldDef, Type fieldType, Object target, ResultSet rs) throws SQLException, IllegalAccessException {
         f.setAccessible(true);
         switch (fieldType.getTypeName()) {
+            case "java.lang.Boolean":
+                f.set(target, rs.getBoolean(fieldDef));
+                break;
             case "java.lang.String":
                 f.set(target, rs.getString(fieldDef));
                 break;
@@ -175,6 +178,9 @@ public class Transformer implements ITransformer {
             case "java.lang.Byte[]":
                 f.set(target, rs.getBytes(fieldDef));
                 break;
+            case "byte[]":
+                f.set(target, rs.getBytes(fieldDef));
+                break;
             case "java.lang.Array":
                 f.set(target, rs.getArray(fieldDef));
                 break;
@@ -182,6 +188,7 @@ public class Transformer implements ITransformer {
                 f.set(target, rs.getObject(fieldDef));
                 break;
             default:
+                log.error("unknown type - {}", fieldType.getTypeName());
         }
     }
 

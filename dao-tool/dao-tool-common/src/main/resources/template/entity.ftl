@@ -25,7 +25,6 @@ package com.pphh.dfw;
 import com.pphh.dfw.core.IEntity;
 
 import javax.persistence.*;
-import java.sql.Date;
 
 /**
 * a table entity definition which is used to map table columns to java entities
@@ -37,7 +36,7 @@ import java.sql.Date;
 public class ${table_cap}Entity implements IEntity {
 
     <#list table_fields as x>
-    <#if x == table_fields_pk>
+    <#if table_fields_pk?? && x == table_fields_pk>
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     </#if>
